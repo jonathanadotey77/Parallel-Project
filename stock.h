@@ -2,12 +2,14 @@
 #define STOCK_H
 
 #include <vector>
+#include <string>
+#include <assert.h>
 
 class Stock {
 public:
 
   Stock(int ID, int p, int q, const std::vector< std::pair<int, int> >& distr)
-    : id(ID), price(p), quantity(q), distribution(distr) {}
+    : id(ID), price(p), quantity(q), distribution(distr) {assert(check_distr());}
 
   int getID() const { return id; }
   int getPrice() const { return price; }
@@ -26,6 +28,30 @@ public:
   int minimumValue() const;
   int mostLikelyValue() const;
   int nMostLikelyValues(int n) const;
+
+  bool check_distr() const {
+    int s = 0;
+
+    for(auto& p: distribution) {
+      s += p.first;
+    }
+
+    return s == 100;
+  }
+
+  std::string to_string() const {
+    std::string s;
+
+    s += std::to_string(id) + " " + std::to_string(price) + " " + std::to_string(quantity) + " -8888";
+
+    for(auto& p: distribution) {
+      s += " " + std::to_string(p.first) + " " + std::to_string(p.second);
+    }
+
+    s += " -1888";
+
+    return s;
+  }
 
 private:
 

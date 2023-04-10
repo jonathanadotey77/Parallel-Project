@@ -3,39 +3,20 @@
 #include <cooperative_groups.h>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <random>
 #include <ctime>
 
+#include "knapsack.h"
 #include "stock.h"
+
+extern bool verbose;
 
 namespace cg = cooperative_groups;
 
-
-__device__ unsigned int knapsackBarrier = 0;
-
-// addr must be aligned properly.
-__device__ unsigned int atomicLoad(const unsigned int *addr)
-{
-  const volatile unsigned int *vaddr = addr; // volatile to bypass cache
-  __threadfence(); // for seq_cst loads. Remove for acquire semantics.
-  const unsigned int value = *vaddr;
-  // fence to ensure that dependent reads are correctly ordered
-  __threadfence(); 
-  return value; 
-}
-
-// addr must be aligned properly.
-__device__ void atomicStore(unsigned int *addr, unsigned int value)
-{
-  volatile unsigned int *vaddr = addr; // volatile to bypass cache
-  // fence to ensure that previous non-atomic stores are visible to other threads
-  __threadfence(); 
-  *vaddr = value;
-}
-
 void allocateItems(const std::vector<Stock>& stocks,
-                    int*& item_costs, int*& item_values, int*& item_quantities,
-                    unsigned short*& chosen) {
+  int*& item_costs, int*& item_values, int*& item_quantities,
+  unsigned short*& chosen) {
   
   cudaMallocManaged(&item_costs, stocks.size() * sizeof(int));
   cudaMallocManaged(&item_values, stocks.size() * sizeof(int));
@@ -52,64 +33,137 @@ void allocateItems(const std::vector<Stock>& stocks,
   }
 }
 
-void allocateTable(int*& table, const size_t num_items, const int budget) {
-  cudaMalloc(&table, (num_items+1) * (budget + 1) * sizeof(int));
+bool load_stocks(std::string filename, std::vector<Stock>& stocks) {
+  std::ifstream inFile(filename);
+
+  if(!inFile.is_open()) {
+    std::cerr << "Could not open file " << filename << std::endl;
+    return false;
+  }
+
+  int id, price, quantity;
+  std::vector< std::pair<int, int> > distr;
+
+  while(inFile >> id) {
+    inFile >> price >> quantity;
+    int a, b;
+
+    inFile >> a;
+    inFile >> a;
+
+    while(a != -1888) {
+      inFile >> b;
+
+      distr.push_back({a, b});
+
+      inFile >> a;
+    }
+
+    stocks.push_back(Stock(id, price, quantity, distr));
+    distr.clear();
+  }
+
+  inFile.close();
+
+  return true;
 }
 
-void freeTable(int* table) {
+bool allocateTables(int*& table, int*& pointers, int*& quants,
+  const size_t num_items, const int budget) {
+  const size_t size = (size_t)((num_items+1) * ((unsigned long)budget + 1));
+
+  cudaError_t err1 = cudaMalloc(&table, size * sizeof(int));
+  if(err1 != cudaSuccess) {
+    printf("Table alloc failed\n");
+    return false;
+  }
+  cudaError_t err2 = cudaMalloc(&pointers, size * sizeof(int));
+  if(err2 != cudaSuccess) {
+    printf("Pointer alloc failed\n");
+    cudaFree(table);
+    return false;
+  }
+
+  cudaError_t err3 = cudaMalloc(&quants, size * sizeof(int));
+  if(err3 != cudaSuccess) {
+    printf("Pointer alloc failed\n");
+    cudaFree(table);
+    cudaFree(pointers);
+    return false;
+  }
+
+  if(verbose) {
+    printf("Total Table memory: %lu\n", 3 * size * sizeof(int));
+  }
+
+  return false;
+}
+
+void freeTable(int* table, int* pointers, int* quants) {
   cudaFree(table);
+  cudaFree(pointers);
+  cudaFree(quants);
 }
 
 void freeItems(int* item_costs, int* item_values, int* item_quantities,
-               unsigned short* chosen) {
+  unsigned short* chosen) {
+
   cudaFree(chosen);
   cudaFree(item_costs);
   cudaFree(item_values);
   cudaFree(item_quantities);
 }
 
-__global__ void knapsackKernel(int* item_costs,
-                         int* item_values,
-                         int* item_quantities,
-                         unsigned short* chosen,
-                         int* table,
-                         size_t num_items,
-                         int budget) {
+__global__ void knapsackKernel(
+  const int* item_costs,
+  const int* item_values,
+  const int* item_quantities,
+  int* table,
+  int* pointers,
+  int* quants,
+  const size_t num_items,
+  const int offset,
+  const int budget) {
 
   cg::grid_group grid = cg::this_grid();
-  const int w = blockIdx.x * blockDim.x + threadIdx.x;
-
-  
-  const int rows = num_items+1;
+  const int w = blockIdx.x * blockDim.x + threadIdx.x + offset;
   const int cols = budget+1;
-  //table[item][cost] = table[item*cols + cost];
+  
   if(w <= num_items) {
     table[w * cols + 0] = 0;
+    pointers[w * cols + 0] = 0;
+    quants[w * cols + 0] = 0;
   }
-
-  // __syncthreads();
 
   if(w <= budget) {
     table[w] = 0;
+    pointers[w] = 0;
+    quants[w] = 0;
   }
   
-  // __syncthreads();
   grid.sync();
 
-  if(w <= budget) {
-    for(int i = 1; i <= num_items; ++i) {
-      table[i*cols + w] = table[(i-1)*cols + w];
-      int a = table[i*cols + w];
-      for(int q = 1; q <= item_quantities[i-1] && q * item_costs[i-1] <= w; ++q) {
-        int val = table[(i-1)*cols + (w - q * item_costs[i-1])] + (q * item_values[i-1]);
+  for(int i = 1; i <= num_items; ++i) {
+    if(w <= budget) {
+      int a = table[(i-1)*cols + w];
+      int cost = item_costs[i-1];
+      int value = item_values[i-1];
+      int quantity = item_quantities[i-1];
+      int last = w;
+      int quant = 0;
+      for(int q = 1; q <= quantity && q * cost <= w; ++q) {
+        int val = table[(i-1)*cols + (w - q * cost)] + (q * value);
         if(val > a) {
           a = val;
+          last = (w - q * cost);
+          quant = q;
         }
       }
       table[i*cols + w] = a;
-      // __syncthreads();
-      grid.sync();
+      pointers[i*cols + w] = last;
+      quants[i*cols + w] = quant;
     }
+    grid.sync();
   }
 }
 
@@ -119,75 +173,103 @@ __global__ void pullValue(int* table, int* val, size_t idx) {
   }
 }
 
-int knapsack(std::vector<Stock>& stocks, size_t num_items, int budget) {
+__global__ void getChosenStocks(int* table, int* pointers, int* quants,
+  int* item_costs, int* item_values, int* item_quantities,
+  unsigned short* chosen, int num_items, int budget, int result) {
+
+  if(blockIdx.x + threadIdx.x == 0) {
+    int cols = budget+1;
+    int w = budget;
+    for(int i = num_items; i > 0 && result > 0; --i) {
+      chosen[i-1] = quants[i*cols + w];
+      w = pointers[i*cols + w];
+      result = table[(i-1)*cols] + w;
+    }
+  }
+}
+
+void knapsack(const std::vector<Stock>& stocks,
+  std::vector< std::pair<int, int> >& solution,
+  int& total, size_t num_items, int budget) {
 
   int* val;
   unsigned short* chosen;
   int* table;
+  int* pointers;
+  int* quants;
+  int offset = 0;
+
   cudaMallocManaged(&val, 1 * sizeof(int));
   *val = 0;
 
-  int* item_weights;
+  int* item_costs;
   int* item_values;
   int* item_quantities;
 
-  allocateItems(stocks, item_weights, item_values, item_quantities, chosen);
-  allocateTable(table, num_items, budget);
+  allocateItems(stocks, item_costs, item_values, item_quantities, chosen);
+  allocateTables(table, pointers, quants, num_items, budget);
+
   void* args[] = {
-    &item_weights,
+    &item_costs,
     &item_values,
     &item_quantities,
-    &chosen,
     &table,
+    &pointers,
+    &quants,
     &num_items,
+    &offset,
     &budget
   };
-  for(int i = 1; i < 8192; ++i) {
-    if(budget < (i*1024)) {
-      dim3 dimGrid(i, 1, 1);
-      printf("Launching %d blocks\n", i);
-      dim3 dimBlock(1024, 1, 1);
-      cudaLaunchCooperativeKernel((void*)knapsackKernel, dimGrid, dimBlock, args);
-      cudaDeviceSynchronize();
-      // knapsackKernel<<< i, 1024 >>>(item_weights, item_values, item_quantities, chosen, table, num_items, budget);
-      break;
+
+  const unsigned int max_blocks = 120;
+  const unsigned int work_per_call = max_blocks * 1024;
+  for(int i = 0; i < budget; i += work_per_call) {
+    offset = i;
+    if(verbose) {
+      printf("work done so far: %7d | launching %d total threads\n", i, work_per_call);
+    }
+    dim3 dimGrid(max_blocks, 1, 1);
+    dim3 dimBlock(1024, 1, 1);
+    cudaLaunchCooperativeKernel((void*)knapsackKernel, dimGrid, dimBlock, args);
+  }
+  pullValue<<< 1, 1 >>>(table, val, num_items*(budget+1) + budget);
+  cudaDeviceSynchronize();
+
+  int v = *val;
+  if(verbose) {
+    printf("Total value is %d, fetching solution\n", v);
+  }
+
+  getChosenStocks<<< 1, 1 >>>(table, pointers, quants, item_costs, item_values, item_quantities,
+          chosen, num_items, budget, v);
+  cudaDeviceSynchronize();
+  if(verbose) {
+    printf("Fetched solution\n");
+  }
+
+  int total_weight = 0;
+  int total_value = 0;
+  for(int i = 0; i < num_items; ++i) {
+    if(chosen[i] == 0) {
+      continue;
+    }
+
+    solution.push_back({i, chosen[i]});
+
+    total_weight += chosen[i] * item_costs[i];
+    total_value += chosen[i] * item_values[i];
+    if(verbose) {
+      printf("Chose %d of stock #%d\n", chosen[i], i+1);
     }
   }
 
-  pullValue<<< 1, 1 >>>(table, val, num_items*(budget+1) + budget);
+  if(total_weight > budget || total_value != v) {
+    printf("Error with knapsack\n");
+  }
 
-  cudaDeviceSynchronize();
-  int v = *val;
-
-  freeItems(item_weights, item_values, item_quantities, chosen);
-  freeTable(table);
+  freeItems(item_costs, item_values, item_quantities, chosen);
+  freeTable(table, pointers, quants);
   cudaFree(val);
 
-  return v;
-}
-
-void generate_test(std::vector<Stock>& stocks) {
-  stocks.push_back(Stock(0, 10, 5, std::vector<std::pair<int, int>>(1, {100, 60})));
-  stocks.push_back(Stock(0, 20, 4, std::vector<std::pair<int, int>>(1, {100, 100})));
-  stocks.push_back(Stock(0, 30, 2, std::vector<std::pair<int, int>>(1, {100, 120})));
-  srand(time(NULL));
-  for(int i = 0; i < 0; ++i) {
-    int w = rand() % 71 + 70;
-    int v = rand() % 24 - 9;
-    int q = rand() % 340;
-    if(q) {
-      // printf("%d %d %d\n", w, v, q);
-    }
-    stocks.push_back(Stock(0, w, q, std::vector<std::pair<int, int>>(1, {100, v})));
-  }
-}
-
-int main() {
-
-  std::vector<Stock> stocks;
-  generate_test(stocks);
-  int v = knapsack(stocks, stocks.size(), 165000);
-  std::cout << v << std::endl;
-
-  return 0;
+  total = v;
 }

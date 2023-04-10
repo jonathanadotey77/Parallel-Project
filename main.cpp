@@ -12,7 +12,6 @@ int knapsack(std::vector<Stock>& stocks, size_t num_items, int budget);
 
 bool read_stock_file(std::vector<Stock>& stocks, char* filename) {
   //Read file input
-
   return true;
 }
 
