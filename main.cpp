@@ -6,9 +6,10 @@
 #include <cstdlib>
 #include "mpi.h"
 
+#include "knapsack.h"
 #include "stock.h"
 
-int knapsack(std::vector<Stock>& stocks, size_t num_items, int budget);
+bool verbose = false;
 
 bool read_stock_file(std::vector<Stock>& stocks, char* filename) {
   //Read file input
@@ -35,13 +36,8 @@ int main(int argc, char** argv) {
   printf("Rank %d of %d\n", myrank, num_ranks);
   MPI_Barrier(MPI_COMM_WORLD);
   std::vector<Stock> stocks;
-  if(myrank == 0) {
-    for(Stock s: stocks) {
-      std::cout << s.getPrice() << " " << s.expectedValue() << std::endl;
-    }
-  }
-  int v = knapsack(stocks, stocks.size(), 8);
-  std::cout << v << std::endl;
+
+  
 
   terminate();
 

@@ -77,14 +77,14 @@ bool allocateTables(int*& table, int*& pointers, int*& quants,
     printf("Table alloc failed\n");
     return false;
   }
-  cudaError_t err2 = cudaMalloc(&pointers, size * sizeof(int));
+  cudaError_t err2 = cudaMallocManaged(&pointers, size * sizeof(int));
   if(err2 != cudaSuccess) {
     printf("Pointer alloc failed\n");
     cudaFree(table);
     return false;
   }
 
-  cudaError_t err3 = cudaMalloc(&quants, size * sizeof(int));
+  cudaError_t err3 = cudaMallocManaged(&quants, size * sizeof(int));
   if(err3 != cudaSuccess) {
     printf("Pointer alloc failed\n");
     cudaFree(table);
@@ -128,7 +128,7 @@ __global__ void knapsackKernel(
   cg::grid_group grid = cg::this_grid();
   const int w = blockIdx.x * blockDim.x + threadIdx.x + offset;
   const int cols = budget+1;
-  
+
   if(w <= num_items) {
     table[w * cols + 0] = 0;
     pointers[w * cols + 0] = 0;
@@ -219,7 +219,7 @@ void knapsack(const std::vector<Stock>& stocks,
     &num_items,
     &offset,
     &budget
-  };
+  };  
 
   const unsigned int max_blocks = 120;
   const unsigned int work_per_call = max_blocks * 1024;

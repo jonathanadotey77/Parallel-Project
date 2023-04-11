@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <assert.h>
+#include <algorithm>
 
 class Stock {
 public:
@@ -24,15 +25,61 @@ public:
 
     return (int)(e + 0.5);
   }
-  int maximumValue() const;
-  int minimumValue() const;
-  int mostLikelyValue() const;
-  int nMostLikelyValues(int n) const;
+
+  int maximumValue() const {
+    int mx = distribution[0].second;
+
+    for(const std::pair<int, int>& p: this->distribution) {
+      int val = p.second;
+      if(val > mx) {
+        mx = val;
+      }
+    }
+
+    return mx;
+  }
+
+  int minimumValue() const {
+    int mn = distribution[0].second;
+
+    for(const std::pair<int, int>& p: this->distribution) {
+      int val = p.second;
+      if(val < mn) {
+        mn = val;
+      }
+    }
+
+    return mn;
+  }
+
+  int mostLikelyValue() const {
+    int max_prob = distribution[0].first;
+    int max_val = distribution[1].second;
+
+    for(const std::pair<int, int>& p: this->distribution) {
+      int prob = p.first;
+      int val = p.second;
+      if(prob > max_prob) {
+        max_prob = prob;
+        max_val = val;
+      }
+    }
+
+    return max_val;
+  }
+  int twoMostLikelyValues() const {
+    std::vector< std::pair<int, int> > copy = this->distribution;
+    std::sort(copy.begin(), copy.end(), [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+      return a.first > b.first || (a.first == b.first && a.second > b.second);
+    });
+
+    return (copy[0].second + copy[1].second) / 2;
+  }
 
   bool check_distr() const {
     int s = 0;
 
-    for(auto& p: distribution) {
+    for(const std::pair<int, int> & p: distribution) {
       s += p.first;
     }
 
