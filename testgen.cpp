@@ -24,21 +24,29 @@ int main(int argc, char** argv) {
   std::string filename(argv[1]);
   std::string arg(argv[2]);
 
-  if(arg != "simple" && arg != "small" && arg != "full") {
-    std::cerr << "Invalid argument\n";
-  }
-
   std::vector<Stock> stocks;
 
   if(arg == "simple") {
     generate_simple_test(stocks);
   } else if(arg == "small") {
     generate_small_test(stocks);
-  } else {
+  } else if(arg == "full") {
     generate_full_test(stocks);
+  }else if(arg == "large") {
+    generate_full_test(stocks, 100000);
+  }else if(arg == "huge") {
+    generate_full_test(stocks, 1000000);
+  } else {
+    std::cerr << "Invalid argument\n";
+    return 1;
   }
 
-  write_test(filename, stocks);
+  // write_test(filename, stocks);
+  std::ofstream os(filename, std::ios::binary);
 
+  for(const auto& s: stocks) {
+    s.write_to_file(os);
+  }
+  os.close();
   return 0;
 }

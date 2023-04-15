@@ -5,12 +5,37 @@
 #include <string>
 #include <assert.h>
 #include <algorithm>
+#include <random>
 
 class Stock {
 public:
 
+  Stock() {
+    id = -1;
+  }
+
   Stock(int ID, int p, int q, const std::vector< std::pair<int, int> >& distr)
-    : id(ID), price(p), quantity(q), distribution(distr) {assert(check_distr());}
+    : id(ID), price(p), quantity(q), distribution(distr) {
+      assert(check_distr());
+      initialize_distr();
+    }
+  
+  Stock(const int* buffer) {
+    this->id = buffer[0];
+    this->price = buffer[1];
+    this->quantity = buffer[2];
+
+    assert(buffer[3] == -8888);
+    assert(buffer[24] == -1888);
+    size_t idx = 4;
+    while(idx != 24) {
+      int p = buffer[idx++];
+      int v = buffer[idx++];
+      this->distribution.push_back({p, v});
+    }
+
+    assert(check_distr());
+  }
 
   int getID() const { return id; }
   int getPrice() const { return price; }
@@ -100,12 +125,107 @@ public:
     return s;
   }
 
+  void write_to_file(std::ostream& os) const {
+    
+    int* data = this->get_data();
+
+    for(int i = 0; i < 25; ++i) {
+      os.write((char*)(data + i), sizeof(int));
+    }
+
+    delete [] data;
+  }
+
+  int* get_data() const {
+    int* buffer = new int[25];
+
+    buffer[0] = id;
+    buffer[1] = price;
+    buffer[2] = quantity;
+    buffer[3] = -8888;
+
+    size_t idx = 4;
+    for(const auto& p: distribution) {
+      buffer[idx++] = p.first;
+      buffer[idx++] = p.second;
+    }
+
+    assert(idx == 24);
+
+    buffer[24] = -1888;
+
+    return buffer;
+  }
+
+  void setPrice(int p) {
+    this->price = p;
+  }
+
+  int generatePrice(bool v = false) {
+
+    int p = mt() % 101;
+
+    size_t i = 0;
+    while(i < distribution.size()) {
+      if(v) {
+        printf("p is %d\n", p);
+      }
+      if(p < distribution[i].first) {
+        return distribution[i].second;
+      }
+
+      p -= distribution[i].first;
+      ++i;
+    }
+
+    return distribution.back().second;
+  }
+
+  void regenerateDistribution() {
+    std::vector< std::pair<int, int> > distr;
+    int d = 2 + mt() % 9;
+
+    int t = 100;
+
+    int range = this->price / 7;
+
+    for(int j = 0; j < d && t > 0; ++j) {
+      int p;
+      if(j+1 == d) {
+        p = t;
+      } else {
+        p = 1 + mt() % t;
+      }
+
+      t -= p;
+
+      int v = range + rand() % (range*2);
+
+      distr.push_back({p, v});
+    }
+
+    this->distribution = distr;
+    assert(check_distr());
+    initialize_distr();
+  }
+
 private:
 
   int id;
   int price;
   int quantity;
   std::vector< std::pair<int, int> > distribution;
+  std::discrete_distribution<int> d;
+  std::mt19937 mt;
+
+  void initialize_distr() {
+    // std::vector<int> temp;
+    // for(const std::pair<int, int>& p: this->distribution) {
+    //   temp.push_back(p.first);
+    // }
+
+    // this->d = std::discrete_distribution<int>(temp.begin(), temp.end());
+  }
 };
 
 #endif

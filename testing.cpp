@@ -1,4 +1,5 @@
 #include <ctime>
+#include <random>
 
 #include "testing.h"
 
@@ -42,9 +43,10 @@ void generate_simple_test(std::vector<Stock>& stocks) {
   }
 }
 
-void generate_full_test(std::vector<Stock>& stocks) {
+void generate_full_test(std::vector<Stock>& stocks, int n) {
   srand(time(NULL));
-  for(int i = 0; i < 1000; ++i) {
+  std::mt19937 mt;
+  for(int i = 0; i < n; ++i) {
     int price = rand() % 71 + 70;
     int quantity = rand() % 340 + 200;
 
@@ -65,9 +67,13 @@ void generate_full_test(std::vector<Stock>& stocks) {
 
       t -= p;
 
-      int v = range + rand() % (range*2);
+      int v = rand() % (range*2) - range;
 
       distr.push_back({p, v});
+    }
+
+    while(distr.size() < 10) {
+      distr.push_back({0, 0});
     }
 
     stocks.push_back(Stock(i, price, quantity, distr));

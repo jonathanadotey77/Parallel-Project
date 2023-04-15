@@ -15,6 +15,7 @@ extern bool verbose;
 namespace cg = cooperative_groups;
 
 void allocateItems(const std::vector<Stock>& stocks,
+  const int* stock_values,
   int*& item_costs, int*& item_values, int*& item_quantities,
   unsigned short*& chosen) {
   
@@ -24,48 +25,13 @@ void allocateItems(const std::vector<Stock>& stocks,
   cudaMallocManaged(&chosen, stocks.size() * sizeof(unsigned short));
   for(size_t i = 0; i < stocks.size(); ++i) {
     int w = stocks[i].getPrice();
-    int v = stocks[i].expectedValue();
+    int v = stock_values[i];
     int q = stocks[i].getQuantity();
     item_costs[i] = w;
     item_values[i] = v;
     item_quantities[i] = q;
     chosen[i] = 0;
   }
-}
-
-bool load_stocks(std::string filename, std::vector<Stock>& stocks) {
-  std::ifstream inFile(filename);
-
-  if(!inFile.is_open()) {
-    std::cerr << "Could not open file " << filename << std::endl;
-    return false;
-  }
-
-  int id, price, quantity;
-  std::vector< std::pair<int, int> > distr;
-
-  while(inFile >> id) {
-    inFile >> price >> quantity;
-    int a, b;
-
-    inFile >> a;
-    inFile >> a;
-
-    while(a != -1888) {
-      inFile >> b;
-
-      distr.push_back({a, b});
-
-      inFile >> a;
-    }
-
-    stocks.push_back(Stock(id, price, quantity, distr));
-    distr.clear();
-  }
-
-  inFile.close();
-
-  return true;
 }
 
 bool allocateTables(int*& table, int*& pointers, int*& quants,
@@ -83,7 +49,7 @@ bool allocateTables(int*& table, int*& pointers, int*& quants,
     cudaFree(table);
     return false;
   }
-
+ 
   cudaError_t err3 = cudaMallocManaged(&quants, size * sizeof(int));
   if(err3 != cudaSuccess) {
     printf("Pointer alloc failed\n");
@@ -189,6 +155,7 @@ __global__ void getChosenStocks(int* table, int* pointers, int* quants,
 }
 
 void knapsack(const std::vector<Stock>& stocks,
+  const int* stock_values,
   std::vector< std::pair<int, int> >& solution,
   int& total, size_t num_items, int budget) {
 
@@ -206,7 +173,7 @@ void knapsack(const std::vector<Stock>& stocks,
   int* item_values;
   int* item_quantities;
 
-  allocateItems(stocks, item_costs, item_values, item_quantities, chosen);
+  allocateItems(stocks, stock_values, item_costs, item_values, item_quantities, chosen);
   allocateTables(table, pointers, quants, num_items, budget);
 
   void* args[] = {
@@ -272,4 +239,22 @@ void knapsack(const std::vector<Stock>& stocks,
   cudaFree(val);
 
   total = v;
+}
+
+bool mapRankToGPU(int myrank) {
+  int cudaDeviceCount, cE;
+
+  if( (cE = cudaGetDeviceCount( &cudaDeviceCount)) != cudaSuccess ) {
+    printf(" Unable to determine cuda device count, error is %d, count is %d\n", cE, cudaDeviceCount );
+    return false;
+  }
+
+  if( (cE = cudaSetDevice( myrank % cudaDeviceCount )) != cudaSuccess ) {
+    printf(" Unable to have rank %d set to cuda device %d, error is %d \n", myrank, (myrank % cudaDeviceCount), cE);
+    return false;
+  }
+
+  printf("Mapping rank %d to CUDA device %d\n", myrank, (myrank % cudaDeviceCount));
+
+  return true;
 }

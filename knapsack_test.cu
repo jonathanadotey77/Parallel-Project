@@ -13,6 +13,41 @@ void usage() {
   std::cerr << "Usage: ./executable <input file> <budget> <option>\n";
 }
 
+bool load_stocks(std::string filename, std::vector<Stock>& stocks) {
+  std::ifstream inFile(filename);
+
+  if(!inFile.is_open()) {
+    std::cerr << "Could not open file " << filename << std::endl;
+    return false;
+  }
+
+  int id, price, quantity;
+  std::vector< std::pair<int, int> > distr;
+
+  while(inFile >> id) {
+    inFile >> price >> quantity;
+    int a, b;
+
+    inFile >> a;
+    inFile >> a;
+
+    while(a != -1888) {
+      inFile >> b;
+
+      distr.push_back({a, b});
+
+      inFile >> a;
+    }
+
+    stocks.push_back(Stock(id, price, quantity, distr));
+    distr.clear();
+  }
+
+  inFile.close();
+
+  return true;
+}
+
 int main(int argc, char** argv) {
   if(argc != 3 && argc != 4) {
     usage();
@@ -50,9 +85,15 @@ int main(int argc, char** argv) {
   
   printf("Num items: %lu\n", stocks.size());
   int v;
+  int* stock_values = new int[stocks.size()];
+  for(size_t i = 0; i < stocks.size(); ++i) {
+    stock_values[i] = stocks[i].expectedValue();
+  }
   std::vector< std::pair<int, int> > solution;
-  knapsack(stocks, solution, v, stocks.size(), budget);
+  knapsack(stocks, stock_values, solution, v, stocks.size(), budget);
   std::cout << v << std::endl;
+
+  free(stock_values);
 
   return 0;
 }
