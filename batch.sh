@@ -2,7 +2,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --time=00:02:00
 #SBATCH --partition=el8
-#SBATCH --ntasks=160
+#SBATCH --ntasks=256
 #SBATCH --nodes=8
 
 module load spectrum-mpi cuda/11.2

@@ -17,7 +17,6 @@ public:
   Stock(int ID, int p, int q, const std::vector< std::pair<int, int> >& distr)
     : id(ID), price(p), quantity(q), distribution(distr) {
       assert(check_distr());
-      initialize_distr();
     }
   
   Stock(const int* buffer) {
@@ -102,6 +101,9 @@ public:
   }
 
   bool check_distr() const {
+    if(distribution.size() != 10) {
+      return false;
+    }
     int s = 0;
 
     for(const std::pair<int, int> & p: distribution) {
@@ -150,11 +152,24 @@ public:
       buffer[idx++] = p.second;
     }
 
-    assert(idx == 24);
-
     buffer[24] = -1888;
 
     return buffer;
+  }
+
+  void write_data(int* buffer) const {
+    buffer[0] = id;
+    buffer[1] = price;
+    buffer[2] = quantity;
+    buffer[3] = -8888;
+
+    size_t idx = 4;
+    for(const auto& p: distribution) {
+      buffer[idx++] = p.first;
+      buffer[idx++] = p.second;
+    }
+
+    buffer[24] = -1888;
   }
 
   void setPrice(int p) {
@@ -163,7 +178,7 @@ public:
 
   int generatePrice(bool v = false) {
 
-    int p = mt() % 101;
+    int p = rand() % 101;
 
     size_t i = 0;
     while(i < distribution.size()) {
@@ -183,7 +198,7 @@ public:
 
   void regenerateDistribution() {
     std::vector< std::pair<int, int> > distr;
-    int d = 2 + mt() % 9;
+    int d = 2 + rand() % 9;
 
     int t = 100;
 
@@ -194,7 +209,7 @@ public:
       if(j+1 == d) {
         p = t;
       } else {
-        p = 1 + mt() % t;
+        p = 1 + rand() % t;
       }
 
       t -= p;
@@ -204,9 +219,12 @@ public:
       distr.push_back({p, v});
     }
 
+    while(distr.size() < 10) {
+      distr.push_back({0, 0});
+    }
+
     this->distribution = distr;
     assert(check_distr());
-    initialize_distr();
   }
 
 private:
@@ -215,17 +233,6 @@ private:
   int price;
   int quantity;
   std::vector< std::pair<int, int> > distribution;
-  std::discrete_distribution<int> d;
-  std::mt19937 mt;
-
-  void initialize_distr() {
-    // std::vector<int> temp;
-    // for(const std::pair<int, int>& p: this->distribution) {
-    //   temp.push_back(p.first);
-    // }
-
-    // this->d = std::discrete_distribution<int>(temp.begin(), temp.end());
-  }
 };
 
 #endif

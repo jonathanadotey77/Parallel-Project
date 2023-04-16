@@ -12,4 +12,4 @@ module load spectrum-mpi cuda/11.2
 # taskset insures that hyperthreaded cores are skipped.
 ###########################################################################################
 #
-taskset -c 0-159:6 mpirun -N 32 /gpfs/u/home/PCPC/PCPCdtjn/barn/git/Parallel-Project/simulate ${1:- } ${2:- } ${3:- } ${4:- }
+taskset -c 0-255:6 mpirun -N 32 /gpfs/u/home/PCPC/PCPCdtjn/barn/git/Parallel-Project/simulate ${1:- } ${2:- } ${3:- } ${4:- }

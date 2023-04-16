@@ -11,93 +11,12 @@
 #include "stock.h"
 #include "investor.h"
 #include "clockcycle.h"
+#include "sim.h"
 
 bool verbose = false;
 
-
 void terminate() {
   MPI_Finalize();
-}
-
-float calc_time(int start, int end) {
-  return (float)(end - start) / 512000000.0;
-}
-
-bool load_stocks(std::string filename, std::vector<Stock>& stocks) {
-  std::ifstream inFile(filename);
-
-  if(!inFile.is_open()) {
-    std::cerr << "Could not open file " << filename << std::endl;
-    return false;
-  }
-
-  int id, price, quantity;
-  std::vector< std::pair<int, int> > distr;
-
-  while(inFile >> id) {
-    inFile >> price >> quantity;
-    int a, b;
-
-    inFile >> a;
-    inFile >> a;
-
-    while(a != -1888) {
-      inFile >> b;
-
-      distr.push_back({a, b});
-
-      inFile >> a;
-    }
-
-    stocks.push_back(Stock(id, price, quantity, distr));
-    std::cout << stocks.back().to_string();
-    distr.clear();
-  }
-
-  inFile.close();
-
-  return true;
-}
-
-void parse_buffer(const char* buffer, std::vector<Stock>& stocks) {
-  std::vector<int> nums;
-
-  std::string temp;
-  for(auto ptr = buffer; *ptr != '\0'; ++ptr) {
-    char c = *ptr;
-
-    if(c == ' ' || c == '\n' || c == '\r') {
-      if(temp.size() > 0) {
-        nums.push_back(std::stoi(temp));
-      }
-      temp.clear();
-    } else {
-      temp.push_back(c);
-    }
-  }
-  
-  if(temp.size() > 0) {
-    nums.push_back(std::stoi(temp));
-  }
-  temp.clear();
-
-  size_t i = 0;
-
-  while(i < nums.size()) {
-    int id = nums[i++];
-    int price = nums[i++];
-    int quantity = nums[i++];
-    std::vector< std::pair<int, int> > distr;
-
-    int a = nums[i++];
-    int b; 
-    while(i < nums.size() && (a = nums[i++]) != -1888) {
-      b = nums[i++];
-      distr.push_back({a, b});
-    }
-    
-    stocks.push_back(Stock(id, price, quantity, distr));
-  }
 }
 
 int main(int argc, char** argv) {
@@ -105,15 +24,25 @@ int main(int argc, char** argv) {
   //MPI Init
   MPI_Init(&argc, &argv);
   srand(time(NULL));
+  env_t* env = new env_t;
 
-  int myrank, localrank, num_ranks;
+  MPI_Comm_size(MPI_COMM_WORLD, &env->num_ranks);
+  MPI_Comm_rank(MPI_COMM_WORLD, &env->globalrank);
+  env->num_nodes = env->num_ranks / 32;
+  env->node = env->globalrank / 32;
+  env->localrank = env->globalrank % 32;
+  env->gpu = env->localrank < GPU_COUNT_;
+  env->cpu = env->localrank >= GPU_COUNT_ && env->localrank < 31;
+  env->worker = env->localrank == 31;
 
-  MPI_Comm_size(MPI_COMM_WORLD, &num_ranks);
-  MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-
+  env->cpu_rank = env->cpu ? CPU_COUNT_ * env->node + (env->localrank - GPU_COUNT_) : -1;
+  env->gpu_rank = env->gpu ? GPU_COUNT_ * env->node + env->localrank : -1;
+  env->worker_rank = env->node;
+  env->num_cpus = CPU_COUNT_ * env->num_nodes;
+  env->num_gpus = GPU_COUNT_ * env->num_nodes;
 
   if(argc < 2) {
-    if(myrank == 0) {
+    if(env->globalrank == 0) {
       printf("USAGE: ./executable <file> <options>\n");
     }
     terminate();
@@ -132,54 +61,61 @@ int main(int argc, char** argv) {
     }
   }
 
-  int num_nodes = num_ranks / 32;
 
-  if(verbose && myrank == 0) {
-    printf("Running program with %d total ranks, in sections of %d on %d node(s)\n", num_ranks, n, num_nodes);
+  if(verbose && env->globalrank == 0) {
+    printf("Running program with %d total ranks, in sections of %d on %d node(s)\n", env->num_ranks, n, env->num_nodes);
   }
-
-  int node = myrank / n;
-  localrank = myrank % n;
-  bool gpu = localrank < 6;
-  bool cpu = localrank >= 6 && localrank < 31;
-  bool worker = localrank == 31;
-
-  int cpu_rank = cpu ? 25 * node + (localrank - 6) : -1;
-  int gpu_rank = gpu ? 6 * node + localrank : -1;
-  int worker_rank = node;
 
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_File fh;
 
-  
   std::vector<Stock> stocks;
 
-  if(verbose && cpu_rank == 0) {
+  if(verbose && env->cpu_rank == 0) {
     printf("Reading from file %s\n", argv[1]);
   }
 
   MPI_File_open(MPI_COMM_WORLD, argv[1], MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
-  int* buffer = NULL;
-  if(cpu) {
-    const int count = 100000 / (25 * num_nodes); // 500
-    MPI_Offset start = cpu_rank * (count * 25);
-    buffer = new int[count * 25];
-    MPI_Status status;
-
-    MPI_File_read_at(fh, start, buffer, 25 * count, MPI_INT, &status);
-
-    for(int i = 0; i < count; ++i) {
-      stocks.push_back(Stock(buffer + i*25));
-    }
-
-    delete [] buffer;
-  }
+  read_file(env, stocks, fh);
   MPI_File_close(&fh);
+
   MPI_Barrier(MPI_COMM_WORLD);
 
-  if(verbose && myrank == 0) {
+  if(verbose && env->globalrank == 0) {
     printf("Finished reading file %s\n", argv[1]);
   }
+
+  if(env->gpu) {
+    stocks = std::vector<Stock>(100000);
+  }
+
+  float a_times[ROUNDS];
+
+  for(int i = 0; i < ROUNDS; ++i) {
+    int* buffer = NULL;
+    if(env->cpu) {
+      pack_stocks(env, stocks, buffer);
+    }
+
+    msg_cpu_to_gpu(env, buffer, a_times[i]);
+
+    if(env->gpu) {
+      unpack_stocks(stocks, buffer);
+      for(size_t i = 0; i < stocks.size(); ++i) {
+        if(stocks[i].getID() == -1) {
+          printf("GPU %d failed to receive all stocks\n", env->gpu_rank);
+          return 1;
+        }
+      }
+    }
+
+    if(verbose && env->globalrank == 0) {
+      printf("Round %d complete (I/O time: %5.3fs)\n", i+1, a_times[i]);
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+  }
+
+  delete env;
 
   terminate();
 
