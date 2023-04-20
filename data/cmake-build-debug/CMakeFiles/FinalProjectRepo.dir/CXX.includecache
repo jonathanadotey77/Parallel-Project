@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/simonsandrew/Documents/RPI/RPI/Parallel Programming/FinalProjectRepo/data/DataController.h
+sqlite3.h
+-
+string
+/Users/simonsandrew/Documents/RPI/RPI/Parallel Programming/FinalProjectRepo/data/string
+exception
+/Users/simonsandrew/Documents/RPI/RPI/Parallel Programming/FinalProjectRepo/data/exception
+
+/Users/simonsandrew/Documents/RPI/RPI/Parallel Programming/FinalProjectRepo/data/DataControllerTests.cpp
+DataController.h
+/Users/simonsandrew/Documents/RPI/RPI/Parallel Programming/FinalProjectRepo/data/DataController.h
+iostream
+-
+
