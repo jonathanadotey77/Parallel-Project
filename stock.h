@@ -100,6 +100,10 @@ public:
     return (copy[0].second + copy[1].second) / 2;
   }
 
+  int randomSample() const {
+    return generatePrice();
+  }
+
   bool check_distr() const {
     if(distribution.size() != 10) {
       return false;
@@ -174,9 +178,10 @@ public:
 
   void setPrice(int p) {
     this->price = p;
+    this->regenerateDistribution();
   }
 
-  int generatePrice(bool v = false) {
+  int generatePrice(bool v = false) const {
 
     int p = rand() % 101;
 
@@ -202,7 +207,7 @@ public:
 
     int t = 100;
 
-    int range = this->price / 7;
+    int range = price / 7;
 
     for(int j = 0; j < d && t > 0; ++j) {
       int p;
@@ -214,7 +219,7 @@ public:
 
       t -= p;
 
-      int v = range + rand() % (range*2);
+      int v = rand() % (range*2) - range;
 
       distr.push_back({p, v});
     }

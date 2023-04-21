@@ -1,6 +1,6 @@
 #!/bin/bash -x
 #SBATCH --gres=gpu:6
-#SBATCH --time=00:02:00
+#SBATCH --time=00:15:00
 #SBATCH --partition=el8
 #SBATCH --ntasks=160
 #SBATCH --nodes=8

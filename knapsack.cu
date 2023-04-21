@@ -156,7 +156,7 @@ __global__ void getChosenStocks(int* table, int* pointers, int* quants,
 
 void knapsack(const std::vector<Stock>& stocks,
   const int* stock_values,
-  std::vector< std::pair<int, int> >& solution,
+  std::vector< std::vector<int> >& solution,
   int& total, size_t num_items, int budget) {
 
   int* val;
@@ -166,6 +166,8 @@ void knapsack(const std::vector<Stock>& stocks,
   int* quants;
   int offset = 0;
 
+  assert(num_items == stocks.size());
+
   cudaMallocManaged(&val, 1 * sizeof(int));
   *val = 0;
 
@@ -173,9 +175,11 @@ void knapsack(const std::vector<Stock>& stocks,
   int* item_values;
   int* item_quantities;
 
+  //Allocate dedicated and shared memory for GPU usage
   allocateItems(stocks, stock_values, item_costs, item_values, item_quantities, chosen);
   allocateTables(table, pointers, quants, num_items, budget);
 
+  //Args for knapsack kernel
   void* args[] = {
     &item_costs,
     &item_values,
@@ -188,8 +192,12 @@ void knapsack(const std::vector<Stock>& stocks,
     &budget
   };  
 
+  //Dimensions for kernel
   const unsigned int max_blocks = 120;
   const unsigned int work_per_call = max_blocks * 1024;
+
+  //We may not be able to run knapsack on the whole table at once
+  //So, we run on "strips" of the table, which achieves the same result
   for(int i = 0; i < budget; i += work_per_call) {
     offset = i;
     if(verbose) {
@@ -197,6 +205,7 @@ void knapsack(const std::vector<Stock>& stocks,
     }
     dim3 dimGrid(max_blocks, 1, 1);
     dim3 dimBlock(1024, 1, 1);
+    //Launch cooperative kernel to ensure that all threads can be synchronized together
     cudaLaunchCooperativeKernel((void*)knapsackKernel, dimGrid, dimBlock, args);
   }
   pullValue<<< 1, 1 >>>(table, val, num_items*(budget+1) + budget);
@@ -207,6 +216,8 @@ void knapsack(const std::vector<Stock>& stocks,
     printf("Total value is %d, fetching solution\n", v);
   }
 
+  //The "backtrack" step of knapsack
+  //Since the table is in GPU dedicated memory, we launch a kernel with thread
   getChosenStocks<<< 1, 1 >>>(table, pointers, quants, item_costs, item_values, item_quantities,
           chosen, num_items, budget, v);
   cudaDeviceSynchronize();
@@ -216,12 +227,15 @@ void knapsack(const std::vector<Stock>& stocks,
 
   int total_weight = 0;
   int total_value = 0;
+
+  //Move solution into a vector
+  solution.clear();
   for(int i = 0; i < num_items; ++i) {
     if(chosen[i] == 0) {
       continue;
     }
 
-    solution.push_back({i, chosen[i]});
+    solution.push_back({stocks[i].getID(), item_costs[i], chosen[i]});
 
     total_weight += chosen[i] * item_costs[i];
     total_value += chosen[i] * item_values[i];
@@ -234,6 +248,7 @@ void knapsack(const std::vector<Stock>& stocks,
     printf("Error with knapsack\n");
   }
 
+  //Free memory
   freeItems(item_costs, item_values, item_quantities, chosen);
   freeTable(table, pointers, quants);
   cudaFree(val);
@@ -250,11 +265,13 @@ bool mapRankToGPU(int myrank) {
   }
 
   if( (cE = cudaSetDevice( myrank % cudaDeviceCount )) != cudaSuccess ) {
-    printf(" Unable to have rank %d set to cuda device %d, error is %d \n", myrank, (myrank % cudaDeviceCount), cE);
+    printf(" Unable to have gpu rank %d set to cuda device %d, error is %d \n", myrank, (myrank % cudaDeviceCount), cE);
     return false;
   }
 
-  printf("Mapping rank %d to CUDA device %d\n", myrank, (myrank % cudaDeviceCount));
+  if(verbose) {
+    printf("Mapping gpu rank %d to CUDA device %d\n", myrank, (myrank % cudaDeviceCount));
+  }
 
   return true;
 }

@@ -22,5 +22,5 @@ void freeItems(int* item_costs, int* item_values, int* item_quantities,
 
 void knapsack(const std::vector<Stock>& stocks,
   const int* stock_values,
-  std::vector< std::pair<int, int> >& solution,
+  std::vector< std::vector<int> >& solution,
   int& total, size_t num_items, int budget);

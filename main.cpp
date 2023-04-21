@@ -61,6 +61,9 @@ int main(int argc, char** argv) {
     }
   }
 
+  if(env->gpu) {
+    mapRankToGPU(env->gpu_rank);
+  }
 
   if(verbose && env->globalrank == 0) {
     printf("Running program with %d total ranks, in sections of %d on %d node(s)\n", env->num_ranks, n, env->num_nodes);
@@ -70,6 +73,7 @@ int main(int argc, char** argv) {
   MPI_File fh;
 
   std::vector<Stock> stocks;
+  std::vector<Investor> investors;
 
   if(verbose && env->cpu_rank == 0) {
     printf("Reading from file %s\n", argv[1]);
@@ -85,19 +89,54 @@ int main(int argc, char** argv) {
     printf("Finished reading file %s\n", argv[1]);
   }
 
+  int local_investor_count = 0;
+  int node_investor_count;
+
   if(env->gpu) {
     stocks = std::vector<Stock>(100000);
+    local_investor_count = 4800 / env->num_gpus;
+    node_investor_count = 4800 / env->num_nodes;
+    investors = std::vector<Investor>(local_investor_count);
+    const int offset = local_investor_count * env->gpu_rank;
+    for(int i = 0; i < local_investor_count; ++i) {
+      int id = offset + i;
+      int strategy = id / 800;
+      int aggressiveness = id % 8;
+      int market = id % 100;
+
+      investors[i] = Investor(id, strategy, aggressiveness, market, 100000);
+    }
   }
 
-  float a_times[ROUNDS];
+  // for(int i = 0; i < env->num_gpus; ++i) {
+
+  //   if(env->gpu && i == env->gpu_rank) {
+  //     for(auto& inv: investors) {
+  //       printf("%4d %d %d\n", inv.getID(), inv.getStrategy(), inv.getAggressiveness());
+  //     }
+  //   }
+
+  //   MPI_Barrier(MPI_COMM_WORLD);
+  // }
+
+  // if(1) {
+  //   terminate();
+  //   return 0;
+  // }
+
+  double io_a_times[ROUNDS];
+  double io_b_times[ROUNDS];
+  double k_times[ROUNDS];
 
   for(int i = 0; i < ROUNDS; ++i) {
     int* buffer = NULL;
+
+    //STEP 1:  CPUs send stocks to GPUs, and GPUs run the parallel knapsack algorithm
     if(env->cpu) {
-      pack_stocks(env, stocks, buffer);
+      pack_stocks(stocks, buffer);
     }
 
-    msg_cpu_to_gpu(env, buffer, a_times[i]);
+    msg_1_cpu_to_gpu(env, buffer, io_a_times[i]);
 
     if(env->gpu) {
       unpack_stocks(stocks, buffer);
@@ -109,11 +148,52 @@ int main(int argc, char** argv) {
       }
     }
 
-    if(verbose && env->globalrank == 0) {
-      printf("Round %d complete (I/O time: %5.3fs)\n", i+1, a_times[i]);
+    delete [] buffer;
+    buffer = NULL;
+
+    if(env->gpu) {
+      int k_start_time = clock_now();
+      invest(env, investors, stocks);
+      int k_end_time = clock_now();
+
+      k_times[i] = calc_time(k_start_time, k_end_time);
     }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+
+    //STEP 2:  CPUs send new stock prices, and investor balances are updated
+    if(env->cpu) {
+      calculate_stock_prices(stocks, buffer);
+    }
+
+    msg_2_cpu_to_gpu(env, buffer, io_b_times[i]);
+    if(env->gpu) {
+      std::vector<int> prices(stocks.size(), -7777777);
+      unpack_prices(prices, buffer);
+      for(size_t i = 0; i < stocks.size(); ++i) {
+        if(prices[i] == -7777777) {
+          printf("GPU %d could not receive all prices\n", env->gpu_rank);
+          return 1;
+        }
+      }
+      evaluate(investors, prices);
+    }
+
+    delete [] buffer;
+    buffer = NULL;
+
+    //Step 3:  Data is recorded to DB
+    //TODO
+
+
+    if(verbose && env->gpu && (env->gpu_rank == 5 || 1)) {
+      printf("Round %d complete (GPU %d) (I/O time: %5.5fs) (Knapsack time: %5.5fs)\n", i+1, env->gpu_rank, io_a_times[i], k_times[i]);
+    }
+
     MPI_Barrier(MPI_COMM_WORLD);
   }
+  if(env->globalrank == 0) printf("End loop\n");
 
   delete env;
 
