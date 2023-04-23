@@ -1,32 +1,23 @@
 #ifndef SIM_H
 #define SIM_H
 
-#define CPU_COUNT_ 25
-#define GPU_COUNT_ 6
-#define ITEM_SIZE 25
-#define ROUNDS 1
-
 #include <vector>
-#include "clockcycle.h"
+#include <algorithm>
+#include <unordered_map>
+#include "macros.h"
+#include "mpi.h"
+#include "env.h"
+#include "timer.h"
 
 extern bool verbose;
 
-typedef struct env_t {
-  int globalrank, localrank, num_ranks, num_nodes;
-  int cpu, gpu, worker;
-  int cpu_rank, gpu_rank, worker_rank, node;
-  int num_cpus, num_gpus;
-} env_t;
-
-double calc_time(int start, int end) {
-  return (double)(end - start) / 512000000.0;
-}
+typedef std::vector< std::vector<int> > solution_vec;
 
 void read_file(const env_t* env, std::vector<Stock>& stocks, MPI_File& fh) {
   if(env->cpu) {
-    const int count = 100000 / env->num_cpus; // 500
+    const int count = 100000 / env->num_cpus; // 4000
     int* buffer = new int[count * 25];
-    MPI_Offset start = env->cpu_rank * (count * 25);
+    MPI_Offset start = env->cpu_rank * (count * 25) * sizeof(int);
     MPI_Status status;
 
     MPI_File_read_at(fh, start, buffer, 25 * count, MPI_INT, &status);
@@ -39,108 +30,63 @@ void read_file(const env_t* env, std::vector<Stock>& stocks, MPI_File& fh) {
   }
 }
 
-void msg_1_cpu_to_gpu(const env_t* env, int*& buffer, double& timer) {
-  const int items_per_cpu = 100000 / (CPU_COUNT_ * env->num_nodes);
-  int start = clock_now();
-  if(env->cpu) {
-    MPI_Request* requests = new MPI_Request[env->num_gpus];
-    for(int n = 0; n < env->num_nodes; ++n) {
-      for(int l = 0; l < GPU_COUNT_; ++l) {
-        int gpu_rank = (GPU_COUNT_ * n) + l;
-        MPI_Isend(buffer, items_per_cpu * ITEM_SIZE, MPI_INT, n*32 + l, 0, MPI_COMM_WORLD, requests + gpu_rank);
+void generate_investors(const env_t* env, std::vector<Investor>& investors) {
+  if(env->worker) {
+    const int num_investors = 4800 / env->num_nodes;
+
+    investors = std::vector<Investor>(num_investors);
+    int offset = env->node * num_investors;
+    for(int i = 0; i < num_investors; ++i) {
+      int id = offset + i;
+      int strategy = id / 800;
+      int aggressiveness = id % 8;
+      int market = id % 100;
+
+      investors[i] = Investor(id, strategy, aggressiveness, market, 100000);
+    }
+  }
+}
+
+solution_vec load_balance( const env_t* env, const std::vector<Investor>& investors) {
+  assert(4800 / env->num_nodes == (int)investors.size());
+  solution_vec solution(6);
+  std::vector< std::pair<int, int> > vec;
+  int weights[GPU_COUNT_];
+  for(int i = 0; i < GPU_COUNT_; ++i) {
+    weights[i] = 0;
+  }
+
+  for(const auto& inv: investors) {
+    vec.push_back({inv.getID(), inv.getSpending()});
+  }
+
+  //Sort by balance (non increasing)
+  std::sort(vec.begin(), vec.end(),
+  [] (const std::pair<int, int>& a, const std::pair<int, int>& b) {
+    return a.second > b.second || (a.second == b.second && a.first < b.first);
+  });
+
+  //Continually add to slot with smallest workload
+  for(size_t i = 0; i < vec.size(); ++i) {
+    //Find min
+    int slot = 0;
+    int mn = weights[0];
+
+    for(int j = 1; j < GPU_COUNT_; ++j) {
+      if(weights[j] < mn) {
+        mn = weights[j];
+        slot = j;
       }
     }
 
-    MPI_Waitall(env->num_gpus, requests, MPI_STATUSES_IGNORE);
-    
-  } else if(env->gpu) {
-    //Receive
-    MPI_Request* requests = new MPI_Request[env->num_cpus];
-    MPI_Status* statuses = new MPI_Status[env->num_cpus];
-
-    //New buffer size is (total cpu count) * (items per cpu) * (size of item buffer)
-    buffer = new int[env->num_cpus * items_per_cpu * ITEM_SIZE];
-    for(int n = 0; n < env->num_nodes; ++n) {
-      for(int l = 0; l < 32; ++l) {
-        if(l < GPU_COUNT_ || l >= CPU_COUNT_ + GPU_COUNT_) {
-          continue;
-        }
-        int cpu_rank = (CPU_COUNT_ * n) + (l - GPU_COUNT_);
-        int* ptr = buffer + (cpu_rank * ITEM_SIZE * items_per_cpu);
-        MPI_Irecv(ptr, items_per_cpu * ITEM_SIZE, MPI_INT, n*32 + l, 0, MPI_COMM_WORLD, requests + cpu_rank);
-      }
-    }
-    
-    MPI_Waitall(env->num_cpus, requests, MPI_STATUSES_IGNORE);
-  
-    delete [] requests;
-    delete [] statuses;
+    solution[slot].push_back(vec[i].first);
+    weights[slot] += vec[i].second;
   }
-  int end = clock_now();
 
-  timer = calc_time(start, end);
+  return solution;
 }
 
-void msg_2_cpu_to_gpu(const env_t* env, int*& buffer, double& timer) {
-  if(env->cpu) {
-    
-  } else if(env->gpu) {
-
-  }
-}
-
-void pack_stocks(const std::vector<Stock>& stocks, int*& buffer) {
-  buffer = new int[stocks.size() * ITEM_SIZE];
-  for(size_t i = 0; i < stocks.size(); ++i) {
-    stocks[i].write_data(buffer + (i * ITEM_SIZE));
-  }
-}
-
-void unpack_stocks(std::vector<Stock>& stocks, const int* buffer) {
-  for(size_t i = 0; i < stocks.size(); ++i) {
-    const int* ptr = buffer + (i * ITEM_SIZE);
-    
-    int id = ptr[0];
-    int price = ptr[1];
-    int quantity = ptr[2];
-    std::vector< std::pair<int, int> > distr;
-
-    assert(ptr[3] == -8888);
-    assert(ptr[24] == -1888);
-    size_t idx = 4;
-    while(idx != 24) {
-      int p = ptr[idx++];
-      int v = ptr[idx++];
-      distr.push_back({p, v});
-    }
-    
-    stocks[i] = Stock(id, price, quantity, distr);
-  }
-}
-
-void calculate_stock_prices(std::vector<Stock>& stocks, int*& buffer) {
-  buffer = new int[stocks.size() * 2];
-  for(size_t i = 0; i < stocks.size(); ++i) {
-    int id = stocks[i].getID();
-    int price = stocks[i].generatePrice();
-
-    buffer[i*2] = id;
-    buffer[i*2 + 1] = price;
-
-    stocks[i].setPrice(price);
-  }
-}
-
-void unpack_prices(std::vector<int>& prices, int* buffer) {
-  const size_t n = prices.size()*2;
-  for(size_t i = 0; i < n; i += 2) {
-    int id = buffer[i];
-    int price = buffer[i+1];
-    prices[id] = price;
-  }
-}
-
-void invest(env_t* env, std::vector<Investor>& investors, const std::vector<Stock>& stocks) {
+void invest(const env_t* env, std::vector<Investor>& investors, const std::vector<Stock>& stocks) {
   std::vector<Stock> market_stock_arr[100];
   for(size_t i = 0; i < stocks.size(); i += 1000) {
     for(int j = 0; j < 1000; ++j) {
@@ -191,7 +137,7 @@ void invest(env_t* env, std::vector<Investor>& investors, const std::vector<Stoc
     
     std::vector< std::vector<int> > solution;
     int total;
-    if(verbose && env->gpu_rank == 5 && (i % 100 == 0)) {
+    if(verbose && env->gpu_rank == 5 && (i % 50 == 0)) {
       printf("Starting knapsack (investor %lu of %lu) with balance %d\n", i, investors.size(), bal);
     }
     int v_temp = verbose;
@@ -200,7 +146,7 @@ void invest(env_t* env, std::vector<Investor>& investors, const std::vector<Stoc
     verbose = v_temp;
 
     investors[i].invest(solution);
-    if(verbose && env->gpu_rank == 5 && (i % 100 == 0)) {
+    if(verbose && env->gpu_rank == 5 && (i % 50 == 0)) {
       printf("Ending knapsack\n");
     }
   }

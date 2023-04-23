@@ -28,6 +28,8 @@ public:
       balance -= oldPrice * quantity;
       balance += newPrices[stockId] * quantity;
     }
+
+    // printf("Investor %d gain/loss: %d\n", this->id, balance - old);
   }
 
   int getID() const {
@@ -48,6 +50,38 @@ public:
 
   int getBalance() const {
     return this->balance;
+  }
+
+  void setBalance(int bal) {
+    this->balance = bal;
+  }
+
+  int getSpending() const {
+    double perc = 0.0;
+    switch(this->aggressiveness) {
+      case 0: perc = 0.10; break;
+      case 1: perc = 0.15; break;
+      case 2: perc = 0.25; break;
+      case 3: perc = 0.35; break;
+      case 4: perc = 0.50; break;
+      case 5: perc = 0.75; break;
+      case 6: perc = 0.85; break;
+      case 7: perc = 1.0; break;
+      default: assert(false); break;
+    }
+
+    return (int)(double(balance) * perc);
+  }
+
+  int* get_data() const {
+    int* data = new int[5];
+    data[0] = id;
+    data[1] = strategy;
+    data[2] = aggressiveness;
+    data[3] = market;
+    data[4] = balance;
+
+    return data;
   }
 
 private:

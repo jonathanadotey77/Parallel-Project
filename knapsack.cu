@@ -8,6 +8,7 @@
 #include <ctime>
 
 #include "knapsack.h"
+#include "timer.h"
 #include "stock.h"
 
 extern bool verbose;
@@ -117,14 +118,18 @@ __global__ void knapsackKernel(
       int quantity = item_quantities[i-1];
       int last = w;
       int quant = 0;
-      for(int q = 1; q <= quantity && q * cost <= w; ++q) {
-        int val = table[(i-1)*cols + (w - q * cost)] + (q * value);
-        if(val > a) {
-          a = val;
-          last = (w - q * cost);
-          quant = q;
+      
+      if(value > 0) {
+        for(int q = 1; q <= quantity && q * cost <= w; ++q) {
+          int val = table[(i-1)*cols + (w - q * cost)] + (q * value);
+          if(val > a) {
+            a = val;
+            last = (w - q * cost);
+            quant = q;
+          }
         }
       }
+
       table[i*cols + w] = a;
       pointers[i*cols + w] = last;
       quants[i*cols + w] = quant;
@@ -157,7 +162,7 @@ __global__ void getChosenStocks(int* table, int* pointers, int* quants,
 void knapsack(const std::vector<Stock>& stocks,
   const int* stock_values,
   std::vector< std::vector<int> >& solution,
-  int& total, size_t num_items, int budget) {
+  int& total, size_t num_items, int budget, double* timer) {
 
   int* val;
   unsigned short* chosen;
@@ -198,6 +203,7 @@ void knapsack(const std::vector<Stock>& stocks,
 
   //We may not be able to run knapsack on the whole table at once
   //So, we run on "strips" of the table, which achieves the same result
+  auto start = clock_time();
   for(int i = 0; i < budget; i += work_per_call) {
     offset = i;
     if(verbose) {
@@ -221,6 +227,8 @@ void knapsack(const std::vector<Stock>& stocks,
   getChosenStocks<<< 1, 1 >>>(table, pointers, quants, item_costs, item_values, item_quantities,
           chosen, num_items, budget, v);
   cudaDeviceSynchronize();
+  auto end = clock_time();
+  if(timer != NULL) *timer = calc_time(start, end);
   if(verbose) {
     printf("Fetched solution\n");
   }
