@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <vector>
 #include <random>
+#include <iomanip>
 #include <unordered_map>
 #include <cstdlib>
 #include "mpi.h"
@@ -30,7 +31,6 @@ int main(int argc, char** argv) {
   MPI_Init(&argc, &argv);
   srand(time(NULL));
   env_t* env = new env_t;
-  char outFile[100] = {'\0'};
   MPI_Comm_size(MPI_COMM_WORLD, &env->num_ranks);
   MPI_Comm_rank(MPI_COMM_WORLD, &env->globalrank);
   env->num_nodes = env->num_ranks / 32;
@@ -46,13 +46,6 @@ int main(int argc, char** argv) {
   env->num_cpus = CPU_COUNT_ * env->num_nodes;
   env->num_gpus = GPU_COUNT_ * env->num_nodes;
 
-  if(env->gpu) {
-    sprintf(outFile, "output/gpu_%d_with_%d_nodes.out", env->gpu_rank, env->num_nodes);
-  }
-
-  if(env->worker) {
-    sprintf(outFile, "output/worker_%d_with_%d_nodes.out", env->worker_rank, env->num_nodes);
-  }
 
   if(argc < 2) {
     if(env->globalrank == 0) {
@@ -74,8 +67,26 @@ int main(int argc, char** argv) {
     }
   }
 
+  std::ofstream outFile1, outFile2;
+
   if(env->gpu) {
+    char outFile1Name[100] = {'\0'};
+    sprintf(outFile1Name, "output/gpu_%d_with_%d_nodes.out", env->gpu_rank, env->num_nodes);
+    outFile1.open(outFile1Name);
+    assert(outFile1.is_open());
+
     mapRankToGPU(env->gpu_rank);
+  }
+
+  if(env->worker) {
+    char outFile1Name[100] = {'\0'};
+    char outFile2Name[100] = {'\0'};
+    sprintf(outFile1Name, "output/worker/worker_%d_with_%d_nodes.out", env->worker_rank, env->num_nodes);
+    sprintf(outFile2Name, "output/round/worker_%d_with_%d_nodes.out", env->worker_rank, env->num_nodes);
+    outFile1.open(outFile1Name);
+    outFile2.open(outFile2Name);
+    assert(outFile1.is_open());
+    assert(outFile2.is_open());
   }
 
   if(verbose && env->globalrank == 0) {
@@ -88,22 +99,6 @@ int main(int argc, char** argv) {
   if(verbose && env->cpu_rank == 0) {
     printf("Reading from file %s\n", argv[1]);
   }
-
-  // MPI_File_open(MPI_COMM_WORLD, argv[1], MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
-  // if(env->cpu_rank == 0) {
-  //   int* buffer = new int[100000 * 25];
-  //   MPI_File_read_at(fh, 0, buffer, 25 * 100000, MPI_INT, MPI_STATUSES_IGNORE);
-  //   for(int i = 0; i < 100000; ++i) {
-  //     printf("item %d: %d\n", i, buffer[i*25]);
-  //   }
-
-  //   delete [] buffer;
-  // }
-  // MPI_File_close(&fh);
-  // if(1) {
-  //   terminate();
-  //   return 0;
-  // }
   std::vector<Stock> stocks;
   std::vector<Investor> investors;
   generate_investors(env, investors);
@@ -118,42 +113,6 @@ int main(int argc, char** argv) {
     printf("Finished reading file %s\n", argv[1]);
   }
 
-
-  // int local_investor_count = 0;
-  // int node_investor_count;
-
-  // if(env->gpu) {
-  //   stocks = std::vector<Stock>(100000);
-  //   local_investor_count = 4800 / env->num_gpus;
-  //   node_investor_count = 4800 / env->num_nodes;
-  //   investors = std::vector<Investor>(local_investor_count);
-  //   const int offset = local_investor_count * env->gpu_rank;
-  //   for(int i = 0; i < local_investor_count; ++i) {
-  //     int id = offset + i;
-  //     int strategy = id / 800;
-  //     int aggressiveness = id % 8;
-  //     int market = id % 100;
-
-  //     investors[i] = Investor(id, strategy, aggressiveness, market, 100000);
-  //   }
-  // }
-
-  // for(int i = 0; i < env->num_gpus; ++i) {
-
-  //   if(env->gpu && i == env->gpu_rank) {
-  //     for(auto& inv: investors) {
-  //       printf("%4d %d %d\n", inv.getID(), inv.getStrategy(), inv.getAggressiveness());
-  //     }
-  //   }
-
-  //   MPI_Barrier(MPI_COMM_WORLD);
-  // }
-
-  // if(1) {
-  //   terminate();
-  //   return 0;
-  // }
-
   double io_a1_times[ROUNDS];
   double io_a2_times[ROUNDS];
   double io_b1_times[ROUNDS];
@@ -165,6 +124,7 @@ int main(int argc, char** argv) {
   }
 
   for(int i = 0; i < ROUNDS; ++i) {
+    auto round_start = clock_time();
     int* buffer = NULL;
 
     //STEP 1:  Stocks and investors are sent to GPUs,
@@ -200,18 +160,10 @@ int main(int argc, char** argv) {
       unpack_investors(env, investors, buffer);
     }
 
-    // for(int i = 0; i < env->num_gpus; ++i) {
-    //   if(env->gpu && i == env->gpu_rank) {
-    //     for(const auto& inv: investors) {
-    //       printf("GPU %d: %d\n", env->gpu_rank, inv.getID());
-    //     }
-    //   }
-    //   MPI_Barrier(MPI_COMM_WORLD);
-    // }
-
+    std::vector<std::pair<int, double> > times;
     if(env->gpu) {
       auto k_start_time = clock_time();
-      invest(env, investors, stocks);
+      invest(env, investors, stocks, times);
       auto k_end_time = clock_time();
 
       k_times[i] = calc_time(k_start_time, k_end_time);
@@ -246,13 +198,37 @@ int main(int argc, char** argv) {
       unpack_results(env, investors, buffer);
     }
 
+    MPI_Barrier(MPI_COMM_WORLD);
+
     if(buffer != NULL) delete [] buffer;
     buffer = NULL;
+    auto round_end = clock_time();
+    auto round_time = calc_time(round_start, round_end);
 
     //Step 3:  Data is written to file
-    
-        
+    if(env->worker) {
+      for(const auto& inv: investors) {
+        outFile1 << "(" << env->num_nodes << " nodes) node " << env->node
+                << " round " << i+1 << " investor_id " << inv.getID()
+                << " strategy " << inv.getStrategy()
+                << " aggressiveness " << inv.getAggressiveness()
+                << " balance " << inv.getBalance() << std::endl;
+      }
 
+      if(env->worker_rank == 0) {
+        outFile2 << "(" << env->num_nodes << " nodes) round "
+                 << i+1 << " time " << std::setprecision(4)
+                 << round_time << std::endl;
+      }
+    }
+
+    if(env->gpu) {
+      for(const auto& p: times) {
+        outFile1 << "(" << env->num_nodes << " nodes) node " << env->node
+                << " round " << i+1 << " balance " << p.first << " time "
+                << std::setprecision(4) << p.second << std::endl;
+      }
+    }
 
     if(verbose && env->gpu && (env->gpu_rank == 5 || 1)) {
       printf("Round %d complete (GPU %d) (I/O time: %5.5fs) (Knapsack time: %5.5fs)\n", i+1, env->gpu_rank, io_a1_times[i], k_times[i]);
@@ -261,6 +237,14 @@ int main(int argc, char** argv) {
     MPI_Barrier(MPI_COMM_WORLD);
   }
   if(env->globalrank == 0) printf("End loop\n");
+
+  if(outFile1.is_open()) {
+    outFile1.close();
+  }
+
+  if(outFile2.is_open()) {
+    outFile2.close();
+  }
 
   delete env;
 

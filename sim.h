@@ -86,7 +86,9 @@ solution_vec load_balance( const env_t* env, const std::vector<Investor>& invest
   return solution;
 }
 
-void invest(const env_t* env, std::vector<Investor>& investors, const std::vector<Stock>& stocks) {
+void invest(const env_t* env, std::vector<Investor>& investors,
+  const std::vector<Stock>& stocks, std::vector< std::pair<int, double> >& times
+) {
   std::vector<Stock> market_stock_arr[100];
   for(size_t i = 0; i < stocks.size(); i += 1000) {
     for(int j = 0; j < 1000; ++j) {
@@ -142,9 +144,10 @@ void invest(const env_t* env, std::vector<Investor>& investors, const std::vecto
     }
     int v_temp = verbose;
     verbose = false;
-    knapsack(market_stocks, stock_values[market][strategy], solution, total, market_stocks.size(), bal);
+    double time = 0.0;
+    knapsack(market_stocks, stock_values[market][strategy], solution, total, market_stocks.size(), bal, &time);
     verbose = v_temp;
-
+    times.push_back({bal, time});
     investors[i].invest(solution);
     if(verbose && env->gpu_rank == 5 && (i % 50 == 0)) {
       printf("Ending knapsack\n");

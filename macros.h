@@ -5,6 +5,6 @@
 #define GPU_COUNT_ 6
 #define ITEM_SIZE 25
 #define INVESTOR_SIZE 5
-#define ROUNDS 1
+#define ROUNDS 5
 
 #endif
