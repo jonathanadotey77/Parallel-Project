@@ -2,7 +2,7 @@
 #SBATCH --gres=gpu:6
 #SBATCH --time=00:06:00
 #SBATCH --partition=el8
-#SBATCH --ntasks=160
+#SBATCH --ntasks=32
 #SBATCH --nodes=8
 
 module load spectrum-mpi cuda/11.2
@@ -12,4 +12,4 @@ module load spectrum-mpi cuda/11.2
 # taskset insures that hyperthreaded cores are skipped.
 ###########################################################################################
 #
-taskset -c 0-255:6 mpirun -N 32 /gpfs/u/home/PCPC/PCPCdtjn/barn/git/Parallel-Project/simulate ${1:- } ${2:- } ${3:- } ${4:- }
+taskset -c 0-32:6 mpirun -N 32 /gpfs/u/home/PCPC/PCPCdtjn/barn/git/Parallel-Project/simulate ${1:- } ${2:- } ${3:- } ${4:- }

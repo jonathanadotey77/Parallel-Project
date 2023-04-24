@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
 
   if(env->gpu) {
     char outFile1Name[100] = {'\0'};
-    sprintf(outFile1Name, "output/gpu_%d_with_%d_nodes.out", env->gpu_rank, env->num_nodes);
+    sprintf(outFile1Name, "output/gpu/gpu_%d_with_%d_nodes.out", env->gpu_rank, env->num_nodes);
     outFile1.open(outFile1Name);
     assert(outFile1.is_open());
 
@@ -207,25 +207,29 @@ int main(int argc, char** argv) {
 
     //Step 3:  Data is written to file
     if(env->worker) {
+      //nodes node round id strategy aggresiveness market balance
       for(const auto& inv: investors) {
-        outFile1 << "(" << env->num_nodes << " nodes) node " << env->node
-                << " round " << i+1 << " investor_id " << inv.getID()
-                << " strategy " << inv.getStrategy()
-                << " aggressiveness " << inv.getAggressiveness()
-                << " balance " << inv.getBalance() << std::endl;
+        outFile1 << env->num_nodes << " " << env->node
+                << " " << i+1 << " " << inv.getID()
+                << " " << inv.getStrategy()
+                << " " << inv.getAggressiveness()
+                << " " << inv.getMarket()
+                << " " << inv.getBalance() << std::endl;
       }
 
       if(env->worker_rank == 0) {
-        outFile2 << "(" << env->num_nodes << " nodes) round "
-                 << i+1 << " time " << std::setprecision(4)
+        //nodes round time
+        outFile2 << env->num_nodes << " "
+                 << i+1 << " " << std::setprecision(4)
                  << round_time << std::endl;
       }
     }
 
     if(env->gpu) {
+      //nodes node round balance time
       for(const auto& p: times) {
-        outFile1 << "(" << env->num_nodes << " nodes) node " << env->node
-                << " round " << i+1 << " balance " << p.first << " time "
+        outFile1 << env->num_nodes << " " << env->node
+                << " " << i+1 << " " << p.first << " "
                 << std::setprecision(4) << p.second << std::endl;
       }
     }
