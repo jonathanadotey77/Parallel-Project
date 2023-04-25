@@ -71,9 +71,13 @@ int main(int argc, char** argv) {
 
   if(env->gpu) {
     char outFile1Name[100] = {'\0'};
+    char outFile2Name[100] = {'\0'};
     sprintf(outFile1Name, "output/gpu/gpu_%d_with_%d_nodes.out", env->gpu_rank, env->num_nodes);
+    sprintf(outFile2Name, "output/io/gpu_%d_with_%d_nodes.out", env->gpu_rank, env->num_nodes);
     outFile1.open(outFile1Name);
+    outFile2.open(outFile2Name);
     assert(outFile1.is_open());
+    assert(outFile2.is_open());
 
     mapRankToGPU(env->gpu_rank);
   }
@@ -208,30 +212,41 @@ int main(int argc, char** argv) {
     //Step 3:  Data is written to file
     if(env->worker) {
       //nodes node round id strategy aggresiveness market balance
+      auto start = clock_time();
       for(const auto& inv: investors) {
         outFile1 << env->num_nodes << " " << env->node
                 << " " << i+1 << " " << inv.getID()
                 << " " << inv.getStrategy()
                 << " " << inv.getAggressiveness()
                 << " " << inv.getMarket()
-                << " " << inv.getBalance() << std::endl;
+                << " " << inv.getBalance() << std::endl;  
       }
+      auto end = clock_time();
+      double io_time = calc_time(start, end);
 
       if(env->worker_rank == 0) {
-        //nodes round time
+        //nodes round time i/o time
         outFile2 << env->num_nodes << " "
-                 << i+1 << " " << std::setprecision(4)
-                 << round_time << std::endl;
+                 << i+1 << " "
+                 << std::setprecision(4) << round_time
+                 << std::setprecision(4) << io_time << std::endl;
       }
     }
 
     if(env->gpu) {
       //nodes node round balance time
+      auto start = clock_time();
       for(const auto& p: times) {
         outFile1 << env->num_nodes << " " << env->node
                 << " " << i+1 << " " << p.first << " "
                 << std::setprecision(4) << p.second << std::endl;
       }
+      auto end = clock_time();
+      double io_time = calc_time(start, end);
+
+      //nodes gpu round time
+      outFile2 << env->num_nodes << " " << env->gpu_rank
+               << " " << i+1 << std::setprecision(7) << io_time << std::endl;
     }
 
     if(verbose && env->gpu && (env->gpu_rank == 5 || 1)) {
