@@ -4,6 +4,6 @@
 CMakeFiles/FinalProjectRepo.dir/DataController.cpp.o: \
  ../DataController.cpp \
  ../DataController.h
-CMakeFiles/FinalProjectRepo.dir/DataControllerTests.cpp.o: \
+CMakeFiles/FinalProjectRepo.dir/database.cpp.o: \
  ../DataController.h \
- ../DataControllerTests.cpp
+ ../database.cpp

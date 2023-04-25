@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/FinalProjectRepo.dir/DataController.cpp.o"
-  "CMakeFiles/FinalProjectRepo.dir/DataControllerTests.cpp.o"
+  "CMakeFiles/FinalProjectRepo.dir/database.cpp.o"
   "FinalProjectRepo"
   "FinalProjectRepo.pdb"
 )

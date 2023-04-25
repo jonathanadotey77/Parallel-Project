@@ -75,175 +75,67 @@ void DataController::printDatabases() const   {
 }
 
 
-void DataController::insertIntoKnapsackTimings(
-        int runId, int numNodes, int gpu, int round, int runtimeMS) {
+void DataController::insertRoundTime(int num_nodes, int round_num, double round_time) {
+    std::string query = "INSERT INTO round_times(num_nodes, round_num, round_time) VALUES (?, ?, ?)";
     sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(conn_, "INSERT INTO knapsack_timings("
-                                               "runId"
-                                               ",numNodes"
-                                               ",gpu"
-                                               ",round"
-                                               ",runtimeMS"
-                                             ") VALUES (?, ?, ?, ?, ?);",
-                                       -1,
-                                       &stmt,
-                                       nullptr);
-    if (rc != SQLITE_OK) {
-        throw std::runtime_error("Failed to prepare insert statement: " +
-        std::string(sqlite3_errmsg(conn_)));
+    int result = sqlite3_prepare_v2(conn_, query.c_str(), -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        throw std::runtime_error("Error preparing statement: " + std::string(sqlite3_errmsg(conn_)));
     }
-
-    rc = sqlite3_bind_int(stmt, 1, runId);
-    rc |= sqlite3_bind_int(stmt, 2, numNodes);
-    rc |= sqlite3_bind_int(stmt, 3, gpu);
-    rc |= sqlite3_bind_int(stmt, 4, round);
-    rc |= sqlite3_bind_int(stmt, 5, runtimeMS);
-    if (rc != SQLITE_OK) {
-        throw std::runtime_error("Failed to bind values to insert statement: " + std::string(sqlite3_errmsg(conn_)));
+    sqlite3_bind_int(stmt, 1, num_nodes);
+    sqlite3_bind_int(stmt, 2, round_num);
+    sqlite3_bind_double(stmt, 3, round_time);
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        throw std::runtime_error("Error executing statement: " + std::string(sqlite3_errmsg(conn_)));
     }
-
-    rc = sqlite3_step(stmt);
-    if (rc != SQLITE_DONE) {
-        throw std::runtime_error("Failed to execute insert statement: " + std::string(sqlite3_errmsg(conn_)));
-    }
-
     sqlite3_finalize(stmt);
 }
 
-void DataController::insertIntoInvestorBalances(int investorId, int roundNum, int balance) {
+void DataController::insertInvestorStatus(int num_nodes, int node_id, int round_num, int investor_id,
+                          int investor_strategy, int investor_aggressiveness, int investor_market,
+                          int investor_balance) {
+    std::string query = "INSERT INTO investor_status(num_nodes, node_id, round_num, investor_id, investor_strategy, investor_aggressiveness, investor_market, investor_balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(conn_, "INSERT INTO investor_balances("
-                                                "investorId"
-                                                ",roundNum"
-                                                ",balance"
-                                              ") VALUES (?, ?, ?);",
-                                       -1,
-                                       &stmt,
-                                       nullptr);
-    if (rc != SQLITE_OK) {
-        throw std::runtime_error("Failed to prepare insert statement: " + std::string(sqlite3_errmsg(conn_)));
+    int result = sqlite3_prepare_v2(conn_, query.c_str(), -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        throw std::runtime_error("Error preparing statement: " + std::string(sqlite3_errmsg(conn_)));
     }
-
-    rc = sqlite3_bind_int(stmt, 1, investorId);
-    rc |= sqlite3_bind_int(stmt, 2, roundNum);
-    rc |= sqlite3_bind_int(stmt, 3, balance);
-    if (rc != SQLITE_OK) {
-        throw std::runtime_error("Failed to bind values to insert statement: " + std::string(sqlite3_errmsg(conn_)));
+    sqlite3_bind_int(stmt, 1, num_nodes);
+    sqlite3_bind_int(stmt, 2, node_id);
+    sqlite3_bind_int(stmt, 3, round_num);
+    sqlite3_bind_int(stmt, 4, investor_id);
+    sqlite3_bind_int(stmt, 5, investor_strategy);
+    sqlite3_bind_int(stmt, 6, investor_aggressiveness);
+    sqlite3_bind_int(stmt, 7, investor_market);
+    sqlite3_bind_int(stmt, 8, investor_balance);
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        throw std::runtime_error("Error executing statement: " + std::string(sqlite3_errmsg(conn_)));
     }
-
-    rc = sqlite3_step(stmt);
-    if (rc != SQLITE_DONE) {
-        throw std::runtime_error("Failed to execute insert statement: " + std::string(sqlite3_errmsg(conn_)));
-    }
-
     sqlite3_finalize(stmt);
 }
 
-void DataController::insertIntoInvestors(int investorId, const std::string& strategy, int aggressiveness) {
+void DataController::insertKnapsackTime(int num_nodes, int node_id, int round_num, int knapsack_balance, double time) {
+    std::string query = "INSERT INTO knapsack_times(num_nodes, node_id, round_num, knapsack_balance, time) VALUES (?, ?, ?, ?, ?)";
     sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(conn_, "INSERT INTO investors("
-                                               "investorId"
-                                               ",strategy"
-                                               ",aggressiveness"
-                                            ") VALUES (?, ?, ?);", -1, &stmt, nullptr);
-    if (rc != SQLITE_OK) {
-        throw std::runtime_error("Failed to prepare insert statement: " + std::string(sqlite3_errmsg(conn_)));
+    int result = sqlite3_prepare_v2(conn_, query.c_str(), -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        throw std::runtime_error("Error preparing statement: " + std::string(sqlite3_errmsg(conn_)));
     }
-
-    rc = sqlite3_bind_int(stmt, 1, investorId);
-    rc |= sqlite3_bind_text(stmt, 2, strategy.c_str(), -1, SQLITE_TRANSIENT);
-    rc |= sqlite3_bind_int(stmt, 3, aggressiveness);
-    if (rc != SQLITE_OK) {
-        throw std::runtime_error("Failed to bind values to insert statement: " + std::string(sqlite3_errmsg(conn_)));
+    sqlite3_bind_int(stmt, 1, num_nodes);
+    sqlite3_bind_int(stmt, 2, node_id);
+    sqlite3_bind_int(stmt, 3, round_num);
+    sqlite3_bind_int(stmt, 4, knapsack_balance);
+    sqlite3_bind_double(stmt, 5, time);
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        throw std::runtime_error("Error executing statement: " + std::string(sqlite3_errmsg(conn_)));
     }
-
-    rc = sqlite3_step(stmt);
-    if (rc != SQLITE_DONE) {
-        throw std::runtime_error("Failed to execute insert statement: " + std::string(sqlite3_errmsg(conn_)));
-    }
-
     sqlite3_finalize(stmt);
 }
 
-void DataController::incrementWins(const std::string& strategy, int aggressiveness) {
-    // Check if a row with the given strategy and aggressiveness exists in the wins table
-    sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(conn_,
-                                "SELECT wins FROM wins WHERE strategy = ? AND aggressiveness = ?;",
-                                -1, &stmt, nullptr);
-    if (rc != SQLITE_OK) {
-        throw std::runtime_error("Failed to prepare select statement: " +
-                                 std::string(sqlite3_errmsg(conn_)));
-    }
 
-    rc = sqlite3_bind_text(stmt, 1, strategy.c_str(), -1, SQLITE_TRANSIENT);
-    rc |= sqlite3_bind_int(stmt, 2, aggressiveness);
-    if (rc != SQLITE_OK) {
-        throw std::runtime_error("Failed to bind values to select statement: " +
-                                 std::string(sqlite3_errmsg(conn_)));
-    }
-
-    rc = sqlite3_step(stmt);
-    if (rc == SQLITE_ROW) {
-        // A row with the given strategy and aggressiveness exists, so increment the wins value
-        int wins = sqlite3_column_int(stmt, 0) + 1;
-        sqlite3_finalize(stmt);
-
-        // Update the row with the new wins value
-        rc = sqlite3_prepare_v2(conn_,
-                                "UPDATE wins SET wins = ? WHERE strategy = ? AND aggressiveness = ?;",
-                                -1, &stmt, nullptr);
-        if (rc != SQLITE_OK) {
-            throw std::runtime_error("Failed to prepare update statement: " +
-                                     std::string(sqlite3_errmsg(conn_)));
-        }
-
-        rc = sqlite3_bind_int(stmt, 1, wins);
-        rc |= sqlite3_bind_text(stmt, 2, strategy.c_str(), -1,
-                                SQLITE_TRANSIENT);
-        rc |= sqlite3_bind_int(stmt, 3, aggressiveness);
-        if (rc != SQLITE_OK) {
-            throw std::runtime_error(
-                    "Failed to bind values to update statement: " +
-                    std::string(sqlite3_errmsg(conn_)));
-        }
-
-        rc = sqlite3_step(stmt);
-        if (rc != SQLITE_DONE) {
-            throw std::runtime_error("Failed to execute update statement: " +
-                                     std::string(sqlite3_errmsg(conn_)));
-        }
-    } else if (rc == SQLITE_DONE) {
-        // A row with the given strategy and aggressiveness does not exist, so insert a new row with a wins value of 1
-        sqlite3_finalize(stmt);
-
-        rc = sqlite3_prepare_v2(conn_,
-                                "INSERT INTO wins(strategy, aggressiveness, wins) VALUES (?, ?, ?);",
-                                -1, &stmt, nullptr);
-        if (rc != SQLITE_OK) {
-            throw std::runtime_error("Failed to prepare insert statement: " +
-                                     std::string(sqlite3_errmsg(conn_)));
-        }
-
-        rc = sqlite3_bind_text(stmt, 1, strategy.c_str(), -1, SQLITE_TRANSIENT);
-        rc |= sqlite3_bind_int(stmt, 2, aggressiveness);
-        rc |= sqlite3_bind_int(stmt, 3, 1);
-        if (rc != SQLITE_OK) {
-            throw std::runtime_error(
-                    "Failed to bind values to insert statement: " +
-                    std::string(sqlite3_errmsg(conn_)));
-        }
-
-        rc = sqlite3_step(stmt);
-        if (rc != SQLITE_DONE) {
-            throw std::runtime_error("Failed to execute insert statement: " +
-                                     std::string(sqlite3_errmsg(conn_)));
-        }
-    } else {
-        throw std::runtime_error("Failed to execute select statement: " +
-                                 std::string(sqlite3_errmsg(conn_)));
-    }
-}
 void DataController::deleteAllRowsFromTable(const std::string& tableName) {
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(conn_, ("DELETE FROM " + tableName + ";").c_str(), -1, &stmt, nullptr);
@@ -258,6 +150,8 @@ void DataController::deleteAllRowsFromTable(const std::string& tableName) {
 
     sqlite3_finalize(stmt);
 }
+
+
 
 
 

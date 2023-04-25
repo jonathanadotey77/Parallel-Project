@@ -153,29 +153,29 @@ DataController.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/FinalProjectRepo.dir/build.make CMakeFiles/FinalProjectRepo.dir/DataController.cpp.s
 .PHONY : DataController.cpp.s
 
-DataControllerTests.o: DataControllerTests.cpp.o
-.PHONY : DataControllerTests.o
+database.o: database.cpp.o
+.PHONY : database.o
 
 # target to build an object file
-DataControllerTests.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FinalProjectRepo.dir/build.make CMakeFiles/FinalProjectRepo.dir/DataControllerTests.cpp.o
-.PHONY : DataControllerTests.cpp.o
+database.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FinalProjectRepo.dir/build.make CMakeFiles/FinalProjectRepo.dir/database.cpp.o
+.PHONY : database.cpp.o
 
-DataControllerTests.i: DataControllerTests.cpp.i
-.PHONY : DataControllerTests.i
+database.i: database.cpp.i
+.PHONY : database.i
 
 # target to preprocess a source file
-DataControllerTests.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FinalProjectRepo.dir/build.make CMakeFiles/FinalProjectRepo.dir/DataControllerTests.cpp.i
-.PHONY : DataControllerTests.cpp.i
+database.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FinalProjectRepo.dir/build.make CMakeFiles/FinalProjectRepo.dir/database.cpp.i
+.PHONY : database.cpp.i
 
-DataControllerTests.s: DataControllerTests.cpp.s
-.PHONY : DataControllerTests.s
+database.s: database.cpp.s
+.PHONY : database.s
 
 # target to generate assembly for a file
-DataControllerTests.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FinalProjectRepo.dir/build.make CMakeFiles/FinalProjectRepo.dir/DataControllerTests.cpp.s
-.PHONY : DataControllerTests.cpp.s
+database.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FinalProjectRepo.dir/build.make CMakeFiles/FinalProjectRepo.dir/database.cpp.s
+.PHONY : database.cpp.s
 
 # Help Target
 help:
@@ -189,9 +189,9 @@ help:
 	@echo "... DataController.o"
 	@echo "... DataController.i"
 	@echo "... DataController.s"
-	@echo "... DataControllerTests.o"
-	@echo "... DataControllerTests.i"
-	@echo "... DataControllerTests.s"
+	@echo "... database.o"
+	@echo "... database.i"
+	@echo "... database.s"
 .PHONY : help
 
 

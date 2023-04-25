@@ -86,7 +86,7 @@
 		<Unit filename="/Users/simonsandrew/Documents/RPI/RPI/Parallel Programming/FinalProjectRepo/data/DataController.h">
 			<Option target="FinalProjectRepo"/>
 		</Unit>
-		<Unit filename="/Users/simonsandrew/Documents/RPI/RPI/Parallel Programming/FinalProjectRepo/data/DataControllerTests.cpp">
+		<Unit filename="/Users/simonsandrew/Documents/RPI/RPI/Parallel Programming/FinalProjectRepo/data/database.cpp">
 			<Option target="FinalProjectRepo"/>
 		</Unit>
 		<Unit filename="/Users/simonsandrew/Documents/RPI/RPI/Parallel Programming/FinalProjectRepo/data/CMakeLists.txt">
