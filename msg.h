@@ -8,7 +8,7 @@
 void msg_1(const env_t* env, int*& buffer, double& timer) {
   const int items_per_cpu = 100000 / (CPU_COUNT_ * env->num_nodes);
   auto start = clock_time();
-  if(env->cpu) {
+  if(env->cpu) {  
     MPI_Request* requests = new MPI_Request[env->num_gpus];
     for(int n = 0; n < env->num_nodes; ++n) {
       for(int l = 0; l < GPU_COUNT_; ++l) {

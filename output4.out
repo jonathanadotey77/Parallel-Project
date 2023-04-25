@@ -1,0 +1,239 @@
++ module load spectrum-mpi cuda/11.2
+++ /usr/share/lmod/lmod/libexec/lmod bash load spectrum-mpi cuda/11.2
++ eval 'CCI_SMPI_SET_TS=2021082400;' export 'CCI_SMPI_SET_TS;' 'CUDA_HOME=/usr/local/cuda-11.2;' export 'CUDA_HOME;' 'CUDA_PATH=/usr/local/cuda-11.2;' export 'CUDA_PATH;' 'LD_LIBRARY_PATH=/usr/local/cuda-11.2/lib64:/opt/ibm/spectrum_mpi/profilesupport/lib:/opt/ibm/spectrum_mpi/lib:/opt/mellanox/sharp/lib:/opt/mellanox/hcoll/lib;' export 'LD_LIBRARY_PATH;' 'LMOD_FAMILY_MPI=spectrum-mpi;' export 'LMOD_FAMILY_MPI;' 'LMOD_FAMILY_MPI_VERSION=10.4;' export 'LMOD_FAMILY_MPI_VERSION;' 'LOADEDMODULES=xl_r/16.1.1:spectrum-mpi/10.4:cuda/11.2;' export 'LOADEDMODULES;' 'MANPATH=/opt/ibm/spectrum_mpi/share/man;' export 'MANPATH;' 'MODULEPATH=/gpfs/u/software/dcs-rhel8/modulefiles/dcs-rhel8/modulefiles/.spectrum-mpi/10.4/.cuda/11.2:/gpfs/u/software/dcs-rhel8/modulefiles/.spectrum-mpi/10.4:/gpfs/u/software/dcs-rhel8/modulefiles/.xl_r/16.1.1:/gpfs/u/software/dcs-rhel8/modulefiles;' export 'MODULEPATH;' 'MPI_ROOT=/opt/ibm/spectrum_mpi;' export 'MPI_ROOT;' 'OPAL_LIBDIR=/opt/ibm/spectrum_mpi/lib;' export 'OPAL_LIBDIR;' 'PAMI_ENABLE_STRIPING=0;' export 'PAMI_ENABLE_STRIPING;' 'PAMI_IBV_ADAPTER_AFFINITY=1;' export 'PAMI_IBV_ADAPTER_AFFINITY;' 'PAMI_IBV_ENABLE_OOO_AR=1;' export 'PAMI_IBV_ENABLE_OOO_AR;' 'PATH=/usr/local/cuda-11.2/bin:/opt/ibm/spectrum_mpi/bin:/opt/ibm/xlf/16.1.1/bin:/opt/ibm/xlC/16.1.1/bin:/usr/lpp/mmfs/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/gpfs/u/home/PCPC/PCPCdtjn/.local/bin:/gpfs/u/home/PCPC/PCPCdtjn/bin;' export 'PATH;' '_LMFILES_=/gpfs/u/software/dcs-rhel8/modulefiles/xl_r/16.1.1.lua:/gpfs/u/software/dcs-rhel8/modulefiles/spectrum-mpi/10.4.lua:/gpfs/u/software/dcs-rhel8/modulefiles/.spectrum-mpi/10.4/cuda/11.2.lua;' export '_LMFILES_;' '_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXtbImNvbXBpbGVyIl09InhsX3IiLFsibXBpIl09InNwZWN0cnVtLW1waSIsfSxtVD17Y3VkYT17WyJmbiJdPSIvZ3Bmcy91L3NvZnR3YXJlL2Rjcy1yaGVsOC9tb2R1bGVmaWxlcy8uc3BlY3RydW0tbXBpLzEwLjQvY3VkYS8xMS4yLmx1YSIsWyJmdWxsTmFtZSJdPSJjdWRhLzExLjIiLFsibG9hZE9yZGVyIl09Myxwcm9wVD17c3RhdGU9e1sidGVzdGluZyJdPTEsfSx9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09ImN1ZGEvMTEuMiIsfSxbInNwZWN0cnVtLW1waSJd;' export '_ModuleTable001_;' '_ModuleTable002_=PXtbImZuIl09Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzL3NwZWN0cnVtLW1waS8xMC40Lmx1YSIsWyJmdWxsTmFtZSJdPSJzcGVjdHJ1bS1tcGkvMTAuNCIsWyJsb2FkT3JkZXIiXT0yLHByb3BUPXtzdGF0ZT17WyJ0ZXN0aW5nIl09MSx9LH0sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic3BlY3RydW0tbXBpIix9LHhsX3I9e1siZm4iXT0iL2dwZnMvdS9zb2Z0d2FyZS9kY3MtcmhlbDgvbW9kdWxlZmlsZXMveGxfci8xNi4xLjEubHVhIixbImZ1bGxOYW1lIl09InhsX3IvMTYuMS4xIixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNl;' export '_ModuleTable002_;' '_ModuleTable003_=ck5hbWUiXT0ieGxfciIsfSx9LG1wYXRoQT17Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzL2Rjcy1yaGVsOC9tb2R1bGVmaWxlcy8uc3BlY3RydW0tbXBpLzEwLjQvLmN1ZGEvMTEuMiIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzLy5zcGVjdHJ1bS1tcGkvMTAuNCIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzLy54bF9yLzE2LjEuMSIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzIix9;' export '_ModuleTable003_;' '_ModuleTable_Sz_=3;' export '_ModuleTable_Sz_;'
+++ CCI_SMPI_SET_TS=2021082400
+++ export CCI_SMPI_SET_TS
+++ CUDA_HOME=/usr/local/cuda-11.2
+++ export CUDA_HOME
+++ CUDA_PATH=/usr/local/cuda-11.2
+++ export CUDA_PATH
+++ LD_LIBRARY_PATH=/usr/local/cuda-11.2/lib64:/opt/ibm/spectrum_mpi/profilesupport/lib:/opt/ibm/spectrum_mpi/lib:/opt/mellanox/sharp/lib:/opt/mellanox/hcoll/lib
+++ export LD_LIBRARY_PATH
+++ LMOD_FAMILY_MPI=spectrum-mpi
+++ export LMOD_FAMILY_MPI
+++ LMOD_FAMILY_MPI_VERSION=10.4
+++ export LMOD_FAMILY_MPI_VERSION
+++ LOADEDMODULES=xl_r/16.1.1:spectrum-mpi/10.4:cuda/11.2
+++ export LOADEDMODULES
+++ MANPATH=/opt/ibm/spectrum_mpi/share/man
+++ export MANPATH
+++ MODULEPATH=/gpfs/u/software/dcs-rhel8/modulefiles/dcs-rhel8/modulefiles/.spectrum-mpi/10.4/.cuda/11.2:/gpfs/u/software/dcs-rhel8/modulefiles/.spectrum-mpi/10.4:/gpfs/u/software/dcs-rhel8/modulefiles/.xl_r/16.1.1:/gpfs/u/software/dcs-rhel8/modulefiles
+++ export MODULEPATH
+++ MPI_ROOT=/opt/ibm/spectrum_mpi
+++ export MPI_ROOT
+++ OPAL_LIBDIR=/opt/ibm/spectrum_mpi/lib
+++ export OPAL_LIBDIR
+++ PAMI_ENABLE_STRIPING=0
+++ export PAMI_ENABLE_STRIPING
+++ PAMI_IBV_ADAPTER_AFFINITY=1
+++ export PAMI_IBV_ADAPTER_AFFINITY
+++ PAMI_IBV_ENABLE_OOO_AR=1
+++ export PAMI_IBV_ENABLE_OOO_AR
+++ PATH=/usr/local/cuda-11.2/bin:/opt/ibm/spectrum_mpi/bin:/opt/ibm/xlf/16.1.1/bin:/opt/ibm/xlC/16.1.1/bin:/usr/lpp/mmfs/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/gpfs/u/home/PCPC/PCPCdtjn/.local/bin:/gpfs/u/home/PCPC/PCPCdtjn/bin
+++ export PATH
+++ _LMFILES_=/gpfs/u/software/dcs-rhel8/modulefiles/xl_r/16.1.1.lua:/gpfs/u/software/dcs-rhel8/modulefiles/spectrum-mpi/10.4.lua:/gpfs/u/software/dcs-rhel8/modulefiles/.spectrum-mpi/10.4/cuda/11.2.lua
+++ export _LMFILES_
+++ _ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXtbImNvbXBpbGVyIl09InhsX3IiLFsibXBpIl09InNwZWN0cnVtLW1waSIsfSxtVD17Y3VkYT17WyJmbiJdPSIvZ3Bmcy91L3NvZnR3YXJlL2Rjcy1yaGVsOC9tb2R1bGVmaWxlcy8uc3BlY3RydW0tbXBpLzEwLjQvY3VkYS8xMS4yLmx1YSIsWyJmdWxsTmFtZSJdPSJjdWRhLzExLjIiLFsibG9hZE9yZGVyIl09Myxwcm9wVD17c3RhdGU9e1sidGVzdGluZyJdPTEsfSx9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09ImN1ZGEvMTEuMiIsfSxbInNwZWN0cnVtLW1waSJd
+++ export _ModuleTable001_
+++ _ModuleTable002_=PXtbImZuIl09Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzL3NwZWN0cnVtLW1waS8xMC40Lmx1YSIsWyJmdWxsTmFtZSJdPSJzcGVjdHJ1bS1tcGkvMTAuNCIsWyJsb2FkT3JkZXIiXT0yLHByb3BUPXtzdGF0ZT17WyJ0ZXN0aW5nIl09MSx9LH0sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic3BlY3RydW0tbXBpIix9LHhsX3I9e1siZm4iXT0iL2dwZnMvdS9zb2Z0d2FyZS9kY3MtcmhlbDgvbW9kdWxlZmlsZXMveGxfci8xNi4xLjEubHVhIixbImZ1bGxOYW1lIl09InhsX3IvMTYuMS4xIixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNl
+++ export _ModuleTable002_
+++ _ModuleTable003_=ck5hbWUiXT0ieGxfciIsfSx9LG1wYXRoQT17Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzL2Rjcy1yaGVsOC9tb2R1bGVmaWxlcy8uc3BlY3RydW0tbXBpLzEwLjQvLmN1ZGEvMTEuMiIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzLy5zcGVjdHJ1bS1tcGkvMTAuNCIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzLy54bF9yLzE2LjEuMSIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzIix9
+++ export _ModuleTable003_
+++ _ModuleTable_Sz_=3
+++ export _ModuleTable_Sz_
+++ : -s sh
++ eval
++ taskset -c 0-32:6 mpirun -N 32 /gpfs/u/home/PCPC/PCPCdtjn/barn/git/Parallel-Project/simulate bin100k.bin -v
+Mapping gpu rank 21 to CUDA device 3
+Mapping gpu rank 4 to CUDA device 4
+Mapping gpu rank 13 to CUDA device 1
+Mapping gpu rank 23 to CUDA device 5
+Mapping gpu rank 2 to CUDA device 2
+Mapping gpu rank 18 to CUDA device 0
+Mapping gpu rank 12 to CUDA device 0
+Mapping gpu rank 5 to CUDA device 5
+Mapping gpu rank 10 to CUDA device 4
+Mapping gpu rank 19 to CUDA device 1
+Mapping gpu rank 0 to CUDA device 0
+Running program with 128 total ranks, in sections of 32 on 4 node(s)
+Mapping gpu rank 17 to CUDA device 5
+Mapping gpu rank 20 to CUDA device 2
+Mapping gpu rank 1 to CUDA device 1
+Mapping gpu rank 22 to CUDA device 4
+Mapping gpu rank 3 to CUDA device 3
+Mapping gpu rank 15 to CUDA device 3
+Mapping gpu rank 14 to CUDA device 2
+Mapping gpu rank 16 to CUDA device 4
+Mapping gpu rank 8 to CUDA device 2
+Mapping gpu rank 7 to CUDA device 1
+Mapping gpu rank 6 to CUDA device 0
+Mapping gpu rank 9 to CUDA device 3
+Mapping gpu rank 11 to CUDA device 5
+Reading from file bin100k.bin
+Finished reading file bin100k.bin
+Starting knapsack (investor 0 of 200) with balance 100000
+Ending knapsack
+Starting knapsack (investor 50 of 200) with balance 75000
+Ending knapsack
+Starting knapsack (investor 100 of 200) with balance 35000
+Ending knapsack
+Starting knapsack (investor 150 of 200) with balance 15000
+Ending knapsack
+Ending knapsack (final)
+Round 1 complete (GPU 2) (I/O time: 0.00775s) (Knapsack time: 15.24786s)
+Round 1 complete (GPU 3) (I/O time: 0.00763s) (Knapsack time: 16.68090s)
+Round 1 complete (GPU 4) (I/O time: 0.00775s) (Knapsack time: 16.10312s)
+Round 1 complete (GPU 5) (I/O time: 0.00760s) (Knapsack time: 16.51066s)
+Round 1 complete (GPU 0) (I/O time: 0.00770s) (Knapsack time: 15.64016s)
+Round 1 complete (GPU 22) (I/O time: 0.00787s) (Knapsack time: 14.86464s)
+Round 1 complete (GPU 15) (I/O time: 0.00773s) (Knapsack time: 15.74441s)
+Round 1 complete (GPU 14) (I/O time: 0.00719s) (Knapsack time: 15.67861s)
+Round 1 complete (GPU 16) (I/O time: 0.00719s) (Knapsack time: 16.00021s)
+Round 1 complete (GPU 1) (I/O time: 0.00768s) (Knapsack time: 16.66405s)
+Round 1 complete (GPU 13) (I/O time: 0.00725s) (Knapsack time: 14.12063s)
+Round 1 complete (GPU 23) (I/O time: 0.00793s) (Knapsack time: 14.58456s)
+Round 1 complete (GPU 12) (I/O time: 0.00721s) (Knapsack time: 14.53198s)
+Round 1 complete (GPU 18) (I/O time: 0.00777s) (Knapsack time: 15.26627s)
+Round 1 complete (GPU 20) (I/O time: 0.00814s) (Knapsack time: 13.87909s)
+Round 1 complete (GPU 17) (I/O time: 0.00766s) (Knapsack time: 14.85566s)
+Round 1 complete (GPU 21) (I/O time: 0.00751s) (Knapsack time: 14.82965s)
+Round 1 complete (GPU 19) (I/O time: 0.00796s) (Knapsack time: 14.52250s)
+Round 1 complete (GPU 11) (I/O time: 0.00768s) (Knapsack time: 12.78866s)
+Round 1 complete (GPU 8) (I/O time: 0.00767s) (Knapsack time: 12.87207s)
+Round 1 complete (GPU 7) (I/O time: 0.00760s) (Knapsack time: 13.01110s)
+Round 1 complete (GPU 6) (I/O time: 0.00775s) (Knapsack time: 12.62254s)
+Round 1 complete (GPU 10) (I/O time: 0.00768s) (Knapsack time: 13.20510s)
+Round 1 complete (GPU 9) (I/O time: 0.00766s) (Knapsack time: 12.62275s)
+Starting knapsack (investor 0 of 200) with balance 113482
+Ending knapsack
+Starting knapsack (investor 50 of 200) with balance 82464
+Ending knapsack
+Starting knapsack (investor 100 of 200) with balance 36662
+Ending knapsack
+Starting knapsack (investor 150 of 200) with balance 15304
+Ending knapsack
+Ending knapsack (final)
+Round 2 complete (GPU 17) (I/O time: 0.00643s) (Knapsack time: 14.68447s)
+Round 2 complete (GPU 23) (I/O time: 0.00621s) (Knapsack time: 14.52522s)
+Round 2 complete (GPU 12) (I/O time: 0.00644s) (Knapsack time: 14.93512s)
+Round 2 complete (GPU 9) (I/O time: 0.00637s) (Knapsack time: 12.50912s)
+Round 2 complete (GPU 20) (I/O time: 0.00626s) (Knapsack time: 14.54393s)
+Round 2 complete (GPU 13) (I/O time: 0.00641s) (Knapsack time: 15.56893s)
+Round 2 complete (GPU 19) (I/O time: 0.00628s) (Knapsack time: 14.59506s)
+Round 2 complete (GPU 11) (I/O time: 0.00638s) (Knapsack time: 12.76971s)
+Round 2 complete (GPU 21) (I/O time: 0.00629s) (Knapsack time: 16.29374s)
+Round 2 complete (GPU 8) (I/O time: 0.00628s) (Knapsack time: 12.53633s)
+Round 2 complete (GPU 18) (I/O time: 0.00630s) (Knapsack time: 14.88204s)
+Round 2 complete (GPU 6) (I/O time: 0.00627s) (Knapsack time: 12.68543s)
+Round 2 complete (GPU 7) (I/O time: 0.00633s) (Knapsack time: 12.19412s)
+Round 2 complete (GPU 10) (I/O time: 0.00632s) (Knapsack time: 12.34833s)
+Round 2 complete (GPU 1) (I/O time: 0.00632s) (Knapsack time: 16.20019s)
+Round 2 complete (GPU 0) (I/O time: 0.00603s) (Knapsack time: 16.05361s)
+Round 2 complete (GPU 2) (I/O time: 0.00605s) (Knapsack time: 15.62357s)
+Round 2 complete (GPU 22) (I/O time: 0.00626s) (Knapsack time: 14.89770s)
+Round 2 complete (GPU 16) (I/O time: 0.00638s) (Knapsack time: 14.66563s)
+Round 2 complete (GPU 14) (I/O time: 0.00635s) (Knapsack time: 15.64146s)
+Round 2 complete (GPU 3) (I/O time: 0.00626s) (Knapsack time: 16.62453s)
+Round 2 complete (GPU 4) (I/O time: 0.00608s) (Knapsack time: 15.61729s)
+Round 2 complete (GPU 15) (I/O time: 0.00646s) (Knapsack time: 15.53997s)
+Round 2 complete (GPU 5) (I/O time: 0.00625s) (Knapsack time: 18.17995s)
+Starting knapsack (investor 0 of 200) with balance 128154
+Ending knapsack
+Starting knapsack (investor 50 of 200) with balance 90449
+Ending knapsack
+Starting knapsack (investor 100 of 200) with balance 38381
+Ending knapsack
+Starting knapsack (investor 150 of 200) with balance 15608
+Ending knapsack
+Ending knapsack (final)
+Round 3 complete (GPU 2) (I/O time: 0.00652s) (Knapsack time: 17.62587s)
+Round 3 complete (GPU 1) (I/O time: 0.00653s) (Knapsack time: 17.83532s)
+Round 3 complete (GPU 3) (I/O time: 0.00656s) (Knapsack time: 18.52405s)
+Round 3 complete (GPU 0) (I/O time: 0.00638s) (Knapsack time: 17.46432s)
+Round 3 complete (GPU 4) (I/O time: 0.00644s) (Knapsack time: 17.84619s)
+Round 3 complete (GPU 5) (I/O time: 0.00650s) (Knapsack time: 19.21301s)
+Round 3 complete (GPU 10) (I/O time: 0.00634s) (Knapsack time: 12.81278s)
+Round 3 complete (GPU 22) (I/O time: 0.00657s) (Knapsack time: 15.82022s)
+Round 3 complete (GPU 15) (I/O time: 0.00650s) (Knapsack time: 14.84543s)
+Round 3 complete (GPU 11) (I/O time: 0.00644s) (Knapsack time: 13.04797s)
+Round 3 complete (GPU 20) (I/O time: 0.00657s) (Knapsack time: 15.69181s)
+Round 3 complete (GPU 13) (I/O time: 0.00627s) (Knapsack time: 15.19105s)
+Round 3 complete (GPU 6) (I/O time: 0.00643s) (Knapsack time: 13.08064s)
+Round 3 complete (GPU 21) (I/O time: 0.00658s) (Knapsack time: 16.08986s)
+Round 3 complete (GPU 16) (I/O time: 0.00643s) (Knapsack time: 15.14539s)
+Round 3 complete (GPU 7) (I/O time: 0.00645s) (Knapsack time: 12.49946s)
+Round 3 complete (GPU 23) (I/O time: 0.00660s) (Knapsack time: 15.58982s)
+Round 3 complete (GPU 17) (I/O time: 0.00629s) (Knapsack time: 15.24386s)
+Round 3 complete (GPU 9) (I/O time: 0.00645s) (Knapsack time: 12.50473s)
+Round 3 complete (GPU 18) (I/O time: 0.00658s) (Knapsack time: 15.85588s)
+Round 3 complete (GPU 14) (I/O time: 0.00643s) (Knapsack time: 15.17852s)
+Round 3 complete (GPU 8) (I/O time: 0.00643s) (Knapsack time: 12.56015s)
+Round 3 complete (GPU 19) (I/O time: 0.00661s) (Knapsack time: 17.47154s)
+Round 3 complete (GPU 12) (I/O time: 0.00643s) (Knapsack time: 15.94711s)
+Starting knapsack (investor 0 of 200) with balance 144746
+Ending knapsack
+Starting knapsack (investor 50 of 200) with balance 98899
+Ending knapsack
+Starting knapsack (investor 100 of 200) with balance 40187
+Ending knapsack
+Starting knapsack (investor 150 of 200) with balance 15919
+Ending knapsack
+Ending knapsack (final)
+Round 4 complete (GPU 5) (I/O time: 0.00757s) (Knapsack time: 20.75424s)
+Round 4 complete (GPU 4) (I/O time: 0.00760s) (Knapsack time: 18.05036s)
+Round 4 complete (GPU 2) (I/O time: 0.00760s) (Knapsack time: 18.22799s)
+Round 4 complete (GPU 1) (I/O time: 0.00761s) (Knapsack time: 18.51918s)
+Round 4 complete (GPU 3) (I/O time: 0.00760s) (Knapsack time: 21.12331s)
+Round 4 complete (GPU 0) (I/O time: 0.00760s) (Knapsack time: 18.06248s)
+Round 4 complete (GPU 17) (I/O time: 0.00746s) (Knapsack time: 16.64238s)
+Round 4 complete (GPU 9) (I/O time: 0.00765s) (Knapsack time: 12.27757s)
+Round 4 complete (GPU 19) (I/O time: 0.00777s) (Knapsack time: 17.77745s)
+Round 4 complete (GPU 15) (I/O time: 0.00746s) (Knapsack time: 16.41108s)
+Round 4 complete (GPU 22) (I/O time: 0.00775s) (Knapsack time: 17.46158s)
+Round 4 complete (GPU 13) (I/O time: 0.00746s) (Knapsack time: 16.63457s)
+Round 4 complete (GPU 11) (I/O time: 0.00765s) (Knapsack time: 13.40322s)
+Round 4 complete (GPU 20) (I/O time: 0.00774s) (Knapsack time: 16.63665s)
+Round 4 complete (GPU 16) (I/O time: 0.00765s) (Knapsack time: 16.54422s)
+Round 4 complete (GPU 10) (I/O time: 0.00760s) (Knapsack time: 12.38826s)
+Round 4 complete (GPU 23) (I/O time: 0.00772s) (Knapsack time: 16.94485s)
+Round 4 complete (GPU 14) (I/O time: 0.00765s) (Knapsack time: 16.53956s)
+Round 4 complete (GPU 7) (I/O time: 0.00763s) (Knapsack time: 12.11121s)
+Round 4 complete (GPU 18) (I/O time: 0.00774s) (Knapsack time: 17.04428s)
+Round 4 complete (GPU 12) (I/O time: 0.00762s) (Knapsack time: 16.62852s)
+Round 4 complete (GPU 8) (I/O time: 0.00760s) (Knapsack time: 12.51032s)
+Round 4 complete (GPU 21) (I/O time: 0.00775s) (Knapsack time: 17.72942s)
+Round 4 complete (GPU 6) (I/O time: 0.00759s) (Knapsack time: 13.21145s)
+Starting knapsack (investor 0 of 200) with balance 163237
+Ending knapsack
+Starting knapsack (investor 50 of 200) with balance 107861
+Ending knapsack
+Starting knapsack (investor 100 of 200) with balance 42016
+Ending knapsack
+Starting knapsack (investor 150 of 200) with balance 16234
+Ending knapsack
+Ending knapsack (final)
+Round 5 complete (GPU 2) (I/O time: 0.00723s) (Knapsack time: 19.91702s)
+Round 5 complete (GPU 1) (I/O time: 0.00726s) (Knapsack time: 21.64167s)
+Round 5 complete (GPU 0) (I/O time: 0.00723s) (Knapsack time: 20.85476s)
+Round 5 complete (GPU 3) (I/O time: 0.00723s) (Knapsack time: 22.16772s)
+Round 5 complete (GPU 4) (I/O time: 0.00733s) (Knapsack time: 19.99968s)
+Round 5 complete (GPU 5) (I/O time: 0.00723s) (Knapsack time: 23.53210s)
+Round 5 complete (GPU 21) (I/O time: 0.00740s) (Knapsack time: 17.83806s)
+Round 5 complete (GPU 17) (I/O time: 0.00739s) (Knapsack time: 16.86881s)
+Round 5 complete (GPU 11) (I/O time: 0.00762s) (Knapsack time: 13.61255s)
+Round 5 complete (GPU 23) (I/O time: 0.00744s) (Knapsack time: 17.40155s)
+Round 5 complete (GPU 13) (I/O time: 0.00743s) (Knapsack time: 16.81664s)
+Round 5 complete (GPU 22) (I/O time: 0.00734s) (Knapsack time: 20.27805s)
+Round 5 complete (GPU 16) (I/O time: 0.00735s) (Knapsack time: 16.84847s)
+Round 5 complete (GPU 9) (I/O time: 0.00757s) (Knapsack time: 12.97394s)
+Round 5 complete (GPU 18) (I/O time: 0.00734s) (Knapsack time: 18.36318s)
+Round 5 complete (GPU 12) (I/O time: 0.00746s) (Knapsack time: 16.82977s)
+Round 5 complete (GPU 8) (I/O time: 0.00751s) (Knapsack time: 14.29625s)
+Round 5 complete (GPU 20) (I/O time: 0.00737s) (Knapsack time: 17.23989s)
+Round 5 complete (GPU 15) (I/O time: 0.00738s) (Knapsack time: 16.85024s)
+Round 5 complete (GPU 6) (I/O time: 0.00749s) (Knapsack time: 12.15061s)
+Round 5 complete (GPU 19) (I/O time: 0.00740s) (Knapsack time: 17.51146s)
+Round 5 complete (GPU 14) (I/O time: 0.00732s) (Knapsack time: 17.06312s)
+Round 5 complete (GPU 10) (I/O time: 0.00756s) (Knapsack time: 12.90553s)
+Round 5 complete (GPU 7) (I/O time: 0.00756s) (Knapsack time: 12.78800s)
+End loop

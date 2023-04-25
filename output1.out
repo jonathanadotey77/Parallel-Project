@@ -1,0 +1,251 @@
++ module load spectrum-mpi cuda/11.2
+++ /usr/share/lmod/lmod/libexec/lmod bash load spectrum-mpi cuda/11.2
++ eval 'CCI_SMPI_SET_TS=2021082400;' export 'CCI_SMPI_SET_TS;' 'CUDA_HOME=/usr/local/cuda-11.2;' export 'CUDA_HOME;' 'CUDA_PATH=/usr/local/cuda-11.2;' export 'CUDA_PATH;' 'LD_LIBRARY_PATH=/usr/local/cuda-11.2/lib64:/opt/ibm/spectrum_mpi/profilesupport/lib:/opt/ibm/spectrum_mpi/lib:/opt/mellanox/sharp/lib:/opt/mellanox/hcoll/lib;' export 'LD_LIBRARY_PATH;' 'LMOD_FAMILY_MPI=spectrum-mpi;' export 'LMOD_FAMILY_MPI;' 'LMOD_FAMILY_MPI_VERSION=10.4;' export 'LMOD_FAMILY_MPI_VERSION;' 'LOADEDMODULES=xl_r/16.1.1:spectrum-mpi/10.4:cuda/11.2;' export 'LOADEDMODULES;' 'MANPATH=/opt/ibm/spectrum_mpi/share/man;' export 'MANPATH;' 'MODULEPATH=/gpfs/u/software/dcs-rhel8/modulefiles/dcs-rhel8/modulefiles/.spectrum-mpi/10.4/.cuda/11.2:/gpfs/u/software/dcs-rhel8/modulefiles/.spectrum-mpi/10.4:/gpfs/u/software/dcs-rhel8/modulefiles/.xl_r/16.1.1:/gpfs/u/software/dcs-rhel8/modulefiles;' export 'MODULEPATH;' 'MPI_ROOT=/opt/ibm/spectrum_mpi;' export 'MPI_ROOT;' 'OPAL_LIBDIR=/opt/ibm/spectrum_mpi/lib;' export 'OPAL_LIBDIR;' 'PAMI_ENABLE_STRIPING=0;' export 'PAMI_ENABLE_STRIPING;' 'PAMI_IBV_ADAPTER_AFFINITY=1;' export 'PAMI_IBV_ADAPTER_AFFINITY;' 'PAMI_IBV_ENABLE_OOO_AR=1;' export 'PAMI_IBV_ENABLE_OOO_AR;' 'PATH=/usr/local/cuda-11.2/bin:/opt/ibm/spectrum_mpi/bin:/opt/ibm/xlf/16.1.1/bin:/opt/ibm/xlC/16.1.1/bin:/usr/lpp/mmfs/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/gpfs/u/home/PCPC/PCPCdtjn/.local/bin:/gpfs/u/home/PCPC/PCPCdtjn/bin;' export 'PATH;' '_LMFILES_=/gpfs/u/software/dcs-rhel8/modulefiles/xl_r/16.1.1.lua:/gpfs/u/software/dcs-rhel8/modulefiles/spectrum-mpi/10.4.lua:/gpfs/u/software/dcs-rhel8/modulefiles/.spectrum-mpi/10.4/cuda/11.2.lua;' export '_LMFILES_;' '_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXtbImNvbXBpbGVyIl09InhsX3IiLFsibXBpIl09InNwZWN0cnVtLW1waSIsfSxtVD17Y3VkYT17WyJmbiJdPSIvZ3Bmcy91L3NvZnR3YXJlL2Rjcy1yaGVsOC9tb2R1bGVmaWxlcy8uc3BlY3RydW0tbXBpLzEwLjQvY3VkYS8xMS4yLmx1YSIsWyJmdWxsTmFtZSJdPSJjdWRhLzExLjIiLFsibG9hZE9yZGVyIl09Myxwcm9wVD17c3RhdGU9e1sidGVzdGluZyJdPTEsfSx9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09ImN1ZGEvMTEuMiIsfSxbInNwZWN0cnVtLW1waSJd;' export '_ModuleTable001_;' '_ModuleTable002_=PXtbImZuIl09Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzL3NwZWN0cnVtLW1waS8xMC40Lmx1YSIsWyJmdWxsTmFtZSJdPSJzcGVjdHJ1bS1tcGkvMTAuNCIsWyJsb2FkT3JkZXIiXT0yLHByb3BUPXtzdGF0ZT17WyJ0ZXN0aW5nIl09MSx9LH0sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic3BlY3RydW0tbXBpIix9LHhsX3I9e1siZm4iXT0iL2dwZnMvdS9zb2Z0d2FyZS9kY3MtcmhlbDgvbW9kdWxlZmlsZXMveGxfci8xNi4xLjEubHVhIixbImZ1bGxOYW1lIl09InhsX3IvMTYuMS4xIixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNl;' export '_ModuleTable002_;' '_ModuleTable003_=ck5hbWUiXT0ieGxfciIsfSx9LG1wYXRoQT17Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzL2Rjcy1yaGVsOC9tb2R1bGVmaWxlcy8uc3BlY3RydW0tbXBpLzEwLjQvLmN1ZGEvMTEuMiIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzLy5zcGVjdHJ1bS1tcGkvMTAuNCIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzLy54bF9yLzE2LjEuMSIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzIix9;' export '_ModuleTable003_;' '_ModuleTable_Sz_=3;' export '_ModuleTable_Sz_;'
+++ CCI_SMPI_SET_TS=2021082400
+++ export CCI_SMPI_SET_TS
+++ CUDA_HOME=/usr/local/cuda-11.2
+++ export CUDA_HOME
+++ CUDA_PATH=/usr/local/cuda-11.2
+++ export CUDA_PATH
+++ LD_LIBRARY_PATH=/usr/local/cuda-11.2/lib64:/opt/ibm/spectrum_mpi/profilesupport/lib:/opt/ibm/spectrum_mpi/lib:/opt/mellanox/sharp/lib:/opt/mellanox/hcoll/lib
+++ export LD_LIBRARY_PATH
+++ LMOD_FAMILY_MPI=spectrum-mpi
+++ export LMOD_FAMILY_MPI
+++ LMOD_FAMILY_MPI_VERSION=10.4
+++ export LMOD_FAMILY_MPI_VERSION
+++ LOADEDMODULES=xl_r/16.1.1:spectrum-mpi/10.4:cuda/11.2
+++ export LOADEDMODULES
+++ MANPATH=/opt/ibm/spectrum_mpi/share/man
+++ export MANPATH
+++ MODULEPATH=/gpfs/u/software/dcs-rhel8/modulefiles/dcs-rhel8/modulefiles/.spectrum-mpi/10.4/.cuda/11.2:/gpfs/u/software/dcs-rhel8/modulefiles/.spectrum-mpi/10.4:/gpfs/u/software/dcs-rhel8/modulefiles/.xl_r/16.1.1:/gpfs/u/software/dcs-rhel8/modulefiles
+++ export MODULEPATH
+++ MPI_ROOT=/opt/ibm/spectrum_mpi
+++ export MPI_ROOT
+++ OPAL_LIBDIR=/opt/ibm/spectrum_mpi/lib
+++ export OPAL_LIBDIR
+++ PAMI_ENABLE_STRIPING=0
+++ export PAMI_ENABLE_STRIPING
+++ PAMI_IBV_ADAPTER_AFFINITY=1
+++ export PAMI_IBV_ADAPTER_AFFINITY
+++ PAMI_IBV_ENABLE_OOO_AR=1
+++ export PAMI_IBV_ENABLE_OOO_AR
+++ PATH=/usr/local/cuda-11.2/bin:/opt/ibm/spectrum_mpi/bin:/opt/ibm/xlf/16.1.1/bin:/opt/ibm/xlC/16.1.1/bin:/usr/lpp/mmfs/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/gpfs/u/home/PCPC/PCPCdtjn/.local/bin:/gpfs/u/home/PCPC/PCPCdtjn/bin
+++ export PATH
+++ _LMFILES_=/gpfs/u/software/dcs-rhel8/modulefiles/xl_r/16.1.1.lua:/gpfs/u/software/dcs-rhel8/modulefiles/spectrum-mpi/10.4.lua:/gpfs/u/software/dcs-rhel8/modulefiles/.spectrum-mpi/10.4/cuda/11.2.lua
+++ export _LMFILES_
+++ _ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXtbImNvbXBpbGVyIl09InhsX3IiLFsibXBpIl09InNwZWN0cnVtLW1waSIsfSxtVD17Y3VkYT17WyJmbiJdPSIvZ3Bmcy91L3NvZnR3YXJlL2Rjcy1yaGVsOC9tb2R1bGVmaWxlcy8uc3BlY3RydW0tbXBpLzEwLjQvY3VkYS8xMS4yLmx1YSIsWyJmdWxsTmFtZSJdPSJjdWRhLzExLjIiLFsibG9hZE9yZGVyIl09Myxwcm9wVD17c3RhdGU9e1sidGVzdGluZyJdPTEsfSx9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09ImN1ZGEvMTEuMiIsfSxbInNwZWN0cnVtLW1waSJd
+++ export _ModuleTable001_
+++ _ModuleTable002_=PXtbImZuIl09Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzL3NwZWN0cnVtLW1waS8xMC40Lmx1YSIsWyJmdWxsTmFtZSJdPSJzcGVjdHJ1bS1tcGkvMTAuNCIsWyJsb2FkT3JkZXIiXT0yLHByb3BUPXtzdGF0ZT17WyJ0ZXN0aW5nIl09MSx9LH0sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic3BlY3RydW0tbXBpIix9LHhsX3I9e1siZm4iXT0iL2dwZnMvdS9zb2Z0d2FyZS9kY3MtcmhlbDgvbW9kdWxlZmlsZXMveGxfci8xNi4xLjEubHVhIixbImZ1bGxOYW1lIl09InhsX3IvMTYuMS4xIixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNl
+++ export _ModuleTable002_
+++ _ModuleTable003_=ck5hbWUiXT0ieGxfciIsfSx9LG1wYXRoQT17Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzL2Rjcy1yaGVsOC9tb2R1bGVmaWxlcy8uc3BlY3RydW0tbXBpLzEwLjQvLmN1ZGEvMTEuMiIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzLy5zcGVjdHJ1bS1tcGkvMTAuNCIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzLy54bF9yLzE2LjEuMSIsIi9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9ncGZzL3Uvc29mdHdhcmUvZGNzLXJoZWw4L21vZHVsZWZpbGVzIix9
+++ export _ModuleTable003_
+++ _ModuleTable_Sz_=3
+++ export _ModuleTable_Sz_
+++ : -s sh
++ eval
++ taskset -c 0-32:6 mpirun -N 32 /gpfs/u/home/PCPC/PCPCdtjn/barn/git/Parallel-Project/simulate bin100k.bin -v
+Mapping gpu rank 5 to CUDA device 5
+Mapping gpu rank 3 to CUDA device 3
+Mapping gpu rank 2 to CUDA device 2
+Mapping gpu rank 0 to CUDA device 0
+Running program with 32 total ranks, in sections of 32 on 1 node(s)
+Mapping gpu rank 4 to CUDA device 4
+Mapping gpu rank 1 to CUDA device 1
+Reading from file bin100k.bin
+Finished reading file bin100k.bin
+Starting knapsack (investor 0 of 800) with balance 100000
+Ending knapsack
+Starting knapsack (investor 50 of 800) with balance 100000
+Ending knapsack
+Starting knapsack (investor 100 of 800) with balance 85000
+Ending knapsack
+Starting knapsack (investor 150 of 800) with balance 85000
+Ending knapsack
+Starting knapsack (investor 200 of 800) with balance 75000
+Ending knapsack
+Starting knapsack (investor 250 of 800) with balance 75000
+Ending knapsack
+Starting knapsack (investor 300 of 800) with balance 50000
+Ending knapsack
+Starting knapsack (investor 350 of 800) with balance 50000
+Ending knapsack
+Starting knapsack (investor 400 of 800) with balance 35000
+Ending knapsack
+Starting knapsack (investor 450 of 800) with balance 35000
+Ending knapsack
+Starting knapsack (investor 500 of 800) with balance 25000
+Ending knapsack
+Starting knapsack (investor 550 of 800) with balance 25000
+Ending knapsack
+Starting knapsack (investor 600 of 800) with balance 15000
+Ending knapsack
+Starting knapsack (investor 650 of 800) with balance 15000
+Ending knapsack
+Starting knapsack (investor 700 of 800) with balance 10000
+Ending knapsack
+Starting knapsack (investor 750 of 800) with balance 10000
+Ending knapsack
+Ending knapsack (final)
+Round 1 complete (GPU 5) (I/O time: 0.00250s) (Knapsack time: 54.43060s)
+Round 1 complete (GPU 2) (I/O time: 0.00204s) (Knapsack time: 55.23841s)
+Round 1 complete (GPU 4) (I/O time: 0.00317s) (Knapsack time: 54.39176s)
+Round 1 complete (GPU 0) (I/O time: 0.00316s) (Knapsack time: 55.10263s)
+Round 1 complete (GPU 1) (I/O time: 0.00291s) (Knapsack time: 54.92795s)
+Round 1 complete (GPU 3) (I/O time: 0.00251s) (Knapsack time: 55.07559s)
+Starting knapsack (investor 0 of 800) with balance 113508
+Ending knapsack
+Starting knapsack (investor 50 of 800) with balance 106985
+Ending knapsack
+Starting knapsack (investor 100 of 800) with balance 94661
+Ending knapsack
+Starting knapsack (investor 150 of 800) with balance 90256
+Ending knapsack
+Starting knapsack (investor 200 of 800) with balance 82474
+Ending knapsack
+Starting knapsack (investor 250 of 800) with balance 79014
+Ending knapsack
+Starting knapsack (investor 300 of 800) with balance 53388
+Ending knapsack
+Starting knapsack (investor 350 of 800) with balance 52555
+Ending knapsack
+Starting knapsack (investor 400 of 800) with balance 36662
+Ending knapsack
+Starting knapsack (investor 450 of 800) with balance 36312
+Ending knapsack
+Starting knapsack (investor 500 of 800) with balance 25848
+Ending knapsack
+Starting knapsack (investor 550 of 800) with balance 25538
+Ending knapsack
+Starting knapsack (investor 600 of 800) with balance 15305
+Ending knapsack
+Starting knapsack (investor 650 of 800) with balance 15247
+Ending knapsack
+Starting knapsack (investor 700 of 800) with balance 10135
+Ending knapsack
+Starting knapsack (investor 750 of 800) with balance 10116
+Ending knapsack
+Ending knapsack (final)
+Round 2 complete (GPU 2) (I/O time: 0.00187s) (Knapsack time: 55.87147s)
+Round 2 complete (GPU 1) (I/O time: 0.00296s) (Knapsack time: 56.14338s)
+Round 2 complete (GPU 3) (I/O time: 0.00296s) (Knapsack time: 59.27062s)
+Round 2 complete (GPU 4) (I/O time: 0.00186s) (Knapsack time: 55.43245s)
+Round 2 complete (GPU 5) (I/O time: 0.00252s) (Knapsack time: 56.97749s)
+Round 2 complete (GPU 0) (I/O time: 0.00191s) (Knapsack time: 56.80064s)
+Starting knapsack (investor 0 of 800) with balance 128549
+Ending knapsack
+Starting knapsack (investor 50 of 800) with balance 115024
+Ending knapsack
+Starting knapsack (investor 100 of 800) with balance 101307
+Ending knapsack
+Starting knapsack (investor 150 of 800) with balance 92106
+Ending knapsack
+Starting knapsack (investor 200 of 800) with balance 87236
+Ending knapsack
+Starting knapsack (investor 250 of 800) with balance 80980
+Ending knapsack
+Starting knapsack (investor 300 of 800) with balance 56991
+Ending knapsack
+Starting knapsack (investor 350 of 800) with balance 53852
+Ending knapsack
+Starting knapsack (investor 400 of 800) with balance 38403
+Ending knapsack
+Starting knapsack (investor 450 of 800) with balance 37648
+Ending knapsack
+Starting knapsack (investor 500 of 800) with balance 26721
+Ending knapsack
+Starting knapsack (investor 550 of 800) with balance 25596
+Ending knapsack
+Starting knapsack (investor 600 of 800) with balance 15612
+Ending knapsack
+Starting knapsack (investor 650 of 800) with balance 15362
+Ending knapsack
+Starting knapsack (investor 700 of 800) with balance 10272
+Ending knapsack
+Starting knapsack (investor 750 of 800) with balance 10159
+Ending knapsack
+Ending knapsack (final)
+Round 3 complete (GPU 1) (I/O time: 0.00187s) (Knapsack time: 59.98050s)
+Round 3 complete (GPU 3) (I/O time: 0.00184s) (Knapsack time: 60.58446s)
+Round 3 complete (GPU 4) (I/O time: 0.00147s) (Knapsack time: 60.73568s)
+Round 3 complete (GPU 0) (I/O time: 0.00156s) (Knapsack time: 60.50610s)
+Round 3 complete (GPU 5) (I/O time: 0.00184s) (Knapsack time: 60.32702s)
+Round 3 complete (GPU 2) (I/O time: 0.00147s) (Knapsack time: 59.73172s)
+Starting knapsack (investor 0 of 800) with balance 144848
+Ending knapsack
+Starting knapsack (investor 50 of 800) with balance 119349
+Ending knapsack
+Starting knapsack (investor 100 of 800) with balance 107342
+Ending knapsack
+Starting knapsack (investor 150 of 800) with balance 98302
+Ending knapsack
+Starting knapsack (investor 200 of 800) with balance 90598
+Ending knapsack
+Starting knapsack (investor 250 of 800) with balance 82812
+Ending knapsack
+Starting knapsack (investor 300 of 800) with balance 60845
+Ending knapsack
+Starting knapsack (investor 350 of 800) with balance 54788
+Ending knapsack
+Starting knapsack (investor 400 of 800) with balance 40190
+Ending knapsack
+Starting knapsack (investor 450 of 800) with balance 38011
+Ending knapsack
+Starting knapsack (investor 500 of 800) with balance 27630
+Ending knapsack
+Starting knapsack (investor 550 of 800) with balance 26012
+Ending knapsack
+Starting knapsack (investor 600 of 800) with balance 15923
+Ending knapsack
+Starting knapsack (investor 650 of 800) with balance 15429
+Ending knapsack
+Starting knapsack (investor 700 of 800) with balance 10411
+Ending knapsack
+Starting knapsack (investor 750 of 800) with balance 10190
+Ending knapsack
+Ending knapsack (final)
+Round 4 complete (GPU 5) (I/O time: 0.00183s) (Knapsack time: 63.26463s)
+Round 4 complete (GPU 2) (I/O time: 0.00152s) (Knapsack time: 64.27064s)
+Round 4 complete (GPU 1) (I/O time: 0.00182s) (Knapsack time: 65.21823s)
+Round 4 complete (GPU 0) (I/O time: 0.00152s) (Knapsack time: 64.05123s)
+Round 4 complete (GPU 3) (I/O time: 0.00183s) (Knapsack time: 64.04535s)
+Round 4 complete (GPU 4) (I/O time: 0.00153s) (Knapsack time: 63.67304s)
+Starting knapsack (investor 0 of 800) with balance 163597
+Ending knapsack
+Starting knapsack (investor 50 of 800) with balance 129378
+Ending knapsack
+Starting knapsack (investor 100 of 800) with balance 113850
+Ending knapsack
+Starting knapsack (investor 150 of 800) with balance 103338
+Ending knapsack
+Starting knapsack (investor 200 of 800) with balance 94009
+Ending knapsack
+Starting knapsack (investor 250 of 800) with balance 84504
+Ending knapsack
+Starting knapsack (investor 300 of 800) with balance 64741
+Ending knapsack
+Starting knapsack (investor 350 of 800) with balance 57282
+Ending knapsack
+Starting knapsack (investor 400 of 800) with balance 42044
+Ending knapsack
+Starting knapsack (investor 450 of 800) with balance 38845
+Ending knapsack
+Starting knapsack (investor 500 of 800) with balance 28526
+Ending knapsack
+Starting knapsack (investor 550 of 800) with balance 26534
+Ending knapsack
+Starting knapsack (investor 600 of 800) with balance 16234
+Ending knapsack
+Starting knapsack (investor 650 of 800) with balance 15573
+Ending knapsack
+Starting knapsack (investor 700 of 800) with balance 10549
+Ending knapsack
+Starting knapsack (investor 750 of 800) with balance 10286
+Ending knapsack
+Ending knapsack (final)
+Round 5 complete (GPU 1) (I/O time: 0.00176s) (Knapsack time: 70.27923s)
+Round 5 complete (GPU 3) (I/O time: 0.00176s) (Knapsack time: 66.97047s)
+Round 5 complete (GPU 2) (I/O time: 0.00169s) (Knapsack time: 66.88832s)
+Round 5 complete (GPU 5) (I/O time: 0.00176s) (Knapsack time: 67.67260s)
+Round 5 complete (GPU 0) (I/O time: 0.00166s) (Knapsack time: 67.91699s)
+Round 5 complete (GPU 4) (I/O time: 0.00169s) (Knapsack time: 67.51781s)
+End loop

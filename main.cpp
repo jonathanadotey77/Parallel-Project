@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
         //nodes round time i/o time
         outFile2 << env->num_nodes << " "
                  << i+1 << " "
-                 << std::setprecision(4) << round_time
+                 << std::setprecision(4) << round_time << " "
                  << std::setprecision(4) << io_time << std::endl;
       }
     }
@@ -249,7 +249,7 @@ int main(int argc, char** argv) {
                << " " << i+1 << " " << std::setprecision(7) << io_time << std::endl;
     }
 
-    if(verbose && env->gpu && (env->gpu_rank == 5 || 1)) {
+    if(verbose && env->gpu) {
       printf("Round %d complete (GPU %d) (I/O time: %5.5fs) (Knapsack time: %5.5fs)\n", i+1, env->gpu_rank, io_a1_times[i], k_times[i]);
     }
 
@@ -271,8 +271,3 @@ int main(int argc, char** argv) {
 
   return 0;
 }
-
-
-
-
-
