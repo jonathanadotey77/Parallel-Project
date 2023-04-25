@@ -9,6 +9,7 @@
 
 class DataController {
 public:
+    /*Insert functions*/
     DataController(const std::string& filename);
     void insertRoundTime(int num_nodes, int round_num, double round_time);
     void insertInvestorStatus(int num_nodes,
@@ -25,8 +26,15 @@ public:
                             int knapsack_balance,
                             double time);
 
+    void insertGpuIoTime(int num_nodes, int round, double time);
+    void insertWorkerIoTime(int num_nodes, int round, double time);
+    void insertKernelTime(int balance, double time);
+    void insertWeakTime(int num_nodes, double time);
+    /* Helper functions*/
     void printDatabases() const;
     void deleteAllRowsFromTable(const std::string& tableName);
+
+
 
 
 private:

@@ -151,12 +151,69 @@ void DataController::deleteAllRowsFromTable(const std::string& tableName) {
     sqlite3_finalize(stmt);
 }
 
+void DataController::insertGpuIoTime(int num_nodes, int round, double time) {
+    std::string query = "INSERT INTO gpu_io_times(num_nodes, round, time) VALUES (?, ?, ?)";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(conn_, query.c_str(), -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        throw std::runtime_error("Error preparing statement: " + std::string(sqlite3_errmsg(conn_)));
+    }
+    sqlite3_bind_int(stmt, 1, num_nodes);
+    sqlite3_bind_int(stmt, 2, round);
+    sqlite3_bind_double(stmt, 3, time);
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        throw std::runtime_error("Error executing statement: " + std::string(sqlite3_errmsg(conn_)));
+    }
+    sqlite3_finalize(stmt);
+}
 
+void DataController::insertWorkerIoTime(int num_nodes, int round, double time) {
+    std::string query = "INSERT INTO worker_io_times(num_nodes, round, time) VALUES (?, ?, ?)";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(conn_, query.c_str(), -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        throw std::runtime_error("Error preparing statement: " + std::string(sqlite3_errmsg(conn_)));
+    }
+    sqlite3_bind_int(stmt, 1, num_nodes);
+    sqlite3_bind_int(stmt, 2, round);
+    sqlite3_bind_double(stmt, 3, time);
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        throw std::runtime_error("Error executing statement: " + std::string(sqlite3_errmsg(conn_)));
+    }
+    sqlite3_finalize(stmt);
+}
 
+void DataController::insertKernelTime(int balance, double time) {
+    std::string query = "INSERT INTO kernel_times(balance, time) VALUES (?, ?)";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(conn_, query.c_str(), -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        throw std::runtime_error("Error preparing statement: " + std::string(sqlite3_errmsg(conn_)));
+    }
+    sqlite3_bind_int(stmt, 1, balance);
+    sqlite3_bind_double(stmt, 2, time);
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        throw std::runtime_error("Error executing statement: " + std::string(sqlite3_errmsg(conn_)));
+    }
+    sqlite3_finalize(stmt);
+}
 
-
-
-
-
-
+void DataController::insertWeakTime(int num_nodes, double time) {
+    std::string query = "INSERT INTO weak_times(num_nodes, time) VALUES (?, ?)";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(conn_, query.c_str(), -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        throw std::runtime_error("Error preparing statement: " + std::string(sqlite3_errmsg(conn_)));
+    }
+    sqlite3_bind_int(stmt, 1, num_nodes);
+    sqlite3_bind_double(stmt, 2, time);
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        throw std::runtime_error("Error executing statement: " + std::string(sqlite3_errmsg(conn_)));
+    }
+    sqlite3_finalize(stmt);
+}
 

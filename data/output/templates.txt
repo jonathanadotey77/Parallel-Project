@@ -1,0 +1,8 @@
+gpu files
+  (total number of nodes) (which node) (round #) (knapsack balance) (time in seconds)
+
+worker files
+  (total number of nodes) (which node) (round #) (investor id) (investor strategy) (investor aggresiveness) (investor market) (investor balance)
+
+round files
+  (total number of nodes) (round #) (round time)
