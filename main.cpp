@@ -246,7 +246,7 @@ int main(int argc, char** argv) {
 
       //nodes gpu round time
       outFile2 << env->num_nodes << " " << env->gpu_rank
-               << " " << i+1 << std::setprecision(7) << io_time << std::endl;
+               << " " << i+1 << " " << std::setprecision(7) << io_time << std::endl;
     }
 
     if(verbose && env->gpu && (env->gpu_rank == 5 || 1)) {
